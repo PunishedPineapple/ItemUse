@@ -1,11 +1,11 @@
-# What did you say?
+# Item Use
 
 ## Purpose
 
-This is a plugin for [XIVLauncher/Dalamud](https://github.com/goatcorp/FFXIVQuickLauncher) that prints NPC speech bubbles to the chat log.
+This is a plugin for [XIVLauncher/Dalamud](https://github.com/goatcorp/FFXIVQuickLauncher) that adds information to (or highlights existing information in) item tooltips to show certain common uses for items (GC dailies, levequests, etc.).
 
 ## Usage
-This plugin works automatically.  You can configure the length of time before allowing repeating text in the plugin settings.
+This plugin automatically adds indicators to item tooltips.  You can configure various options for what is displayed and how in the plugin settings.
 
 ## License
 Code and executable are covered under the [AGPL 3.0](../LICENSE).  Final Fantasy XIV (and any associated data used by this plugin) is owned by and copyright Square Enix.
