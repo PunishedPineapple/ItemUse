@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ using Dalamud.Data;
 using Dalamud.Game.Text;
 using Dalamud.Utility;
 
+using Lumina;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
@@ -23,6 +26,9 @@ internal static class ItemCategorizer
 	internal static void Init()
 	{
 		InitGCItems();
+		InitLeveItems();
+		InitCraftingItems();
+		InitAquariumFish();
 	}
 
 	internal static void Uninit()
@@ -70,70 +76,74 @@ internal static class ItemCategorizer
 	{
 		var GCSupplySheet = DalamudAPI.DataManager.GetExcelSheet<GCSupplyDuty>();
 
-		for( uint i = 1; i < GCSupplySheet.RowCount; ++i )
+		foreach( var row in GCSupplySheet )
 		{
-			HashSet<Int32> rowData = new( GCSupplySheet.GetRow( i ).Unknown0 );
+			HashSet<Int32> rowData = new();
+
+			//	Lumina has this sheet defined kind of questionably.
 			try
 			{
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown11 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown12 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown13 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown14 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown15 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown16 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown17 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown18 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown19 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown20 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown21 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown22 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown23 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown24 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown25 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown26 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown27 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown28 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown29 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown30 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown31 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown32 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown33 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown34 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown35 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown36 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown37 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown38 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown39 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown40 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown41 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown42 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown43 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown44 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown45 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown46 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown47 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown48 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown49 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown50 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown51 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown52 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown53 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown54 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown55 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown56 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown57 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown58 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown59 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown60 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown61 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown62 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown63 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown64 );
-				rowData.Add( GCSupplySheet.GetRow( i ).Unknown65 );
+				rowData.UnionWith( row.Unknown0 );
+
+				rowData.Add( row.Unknown11 );
+				rowData.Add( row.Unknown12 );
+				rowData.Add( row.Unknown13 );
+				rowData.Add( row.Unknown14 );
+				rowData.Add( row.Unknown15 );
+				rowData.Add( row.Unknown16 );
+				rowData.Add( row.Unknown17 );
+				rowData.Add( row.Unknown18 );
+				rowData.Add( row.Unknown19 );
+				rowData.Add( row.Unknown20 );
+				rowData.Add( row.Unknown21 );
+				rowData.Add( row.Unknown22 );
+				rowData.Add( row.Unknown23 );
+				rowData.Add( row.Unknown24 );
+				rowData.Add( row.Unknown25 );
+				rowData.Add( row.Unknown26 );
+				rowData.Add( row.Unknown27 );
+				rowData.Add( row.Unknown28 );
+				rowData.Add( row.Unknown29 );
+				rowData.Add( row.Unknown30 );
+				rowData.Add( row.Unknown31 );
+				rowData.Add( row.Unknown32 );
+				rowData.Add( row.Unknown33 );
+				rowData.Add( row.Unknown34 );
+				rowData.Add( row.Unknown35 );
+				rowData.Add( row.Unknown36 );
+				rowData.Add( row.Unknown37 );
+				rowData.Add( row.Unknown38 );
+				rowData.Add( row.Unknown39 );
+				rowData.Add( row.Unknown40 );
+				rowData.Add( row.Unknown41 );
+				rowData.Add( row.Unknown42 );
+				rowData.Add( row.Unknown43 );
+				rowData.Add( row.Unknown44 );
+				rowData.Add( row.Unknown45 );
+				rowData.Add( row.Unknown46 );
+				rowData.Add( row.Unknown47 );
+				rowData.Add( row.Unknown48 );
+				rowData.Add( row.Unknown49 );
+				rowData.Add( row.Unknown50 );
+				rowData.Add( row.Unknown51 );
+				rowData.Add( row.Unknown52 );
+				rowData.Add( row.Unknown53 );
+				rowData.Add( row.Unknown54 );
+				rowData.Add( row.Unknown55 );
+				rowData.Add( row.Unknown56 );
+				rowData.Add( row.Unknown57 );
+				rowData.Add( row.Unknown58 );
+				rowData.Add( row.Unknown59 );
+				rowData.Add( row.Unknown60 );
+				rowData.Add( row.Unknown61 );
+				rowData.Add( row.Unknown62 );
+				rowData.Add( row.Unknown63 );
+				rowData.Add( row.Unknown64 );
+				rowData.Add( row.Unknown65 );
 			}
 			catch( Exception e )
 			{
-				DalamudAPI.PluginLog.Error( $"Error parsing GCSupplyDuty sheet row {i}:\r\n{e}" );
+				DalamudAPI.PluginLog.Error( $"Error parsing GCSupplyDuty sheet row {row.RowId}:\r\n{e}" );
 			}
 
 			mGCItems.UnionWith( rowData );
@@ -145,7 +155,7 @@ internal static class ItemCategorizer
 				{
 					rowDataString += item + ", ";
 				}
-				DalamudAPI.PluginLog.Verbose( $"GCSupply Row: {i}, Entries: {rowDataString}" );
+				DalamudAPI.PluginLog.Verbose( $"GCSupply Row: {row.RowId}, Entries: {rowDataString}" );
 			}
 		}
 
@@ -165,7 +175,35 @@ internal static class ItemCategorizer
 
 	private static void InitLeveItems()
 	{
+		var leveSheet = DalamudAPI.DataManager.GetExcelSheet<CraftLeve>();
 
+		foreach( var row in leveSheet )
+		{
+			if( row?.UnkData3 != null )
+			{
+				HashSet<Int32> rowData = new();
+
+				foreach( var item in row.UnkData3 )
+				{
+					if( item != null ) rowData.Add( item.Item );
+				}
+
+				mLeveItems.UnionWith( rowData );
+			}
+		};
+
+		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
+		mLeveItems.RemoveWhere( x => ( x < 100 ) );
+
+		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
+		{
+			string itemIDs = "";
+			foreach( var item in mLeveItems )
+			{
+				itemIDs += item + ", ";
+			}
+			DalamudAPI.PluginLog.Debug( $"Loaded Levequest item IDs: {itemIDs}" );
+		}
 	}
 
 	private static void InitCraftingItems()
@@ -175,7 +213,28 @@ internal static class ItemCategorizer
 
 	private static void InitAquariumFish()
 	{
+		var fishSheet = DalamudAPI.DataManager.GetExcelSheet<AquariumFish>();
 
+		foreach( var row in fishSheet )
+		{
+			if( row?.Item != null )
+			{
+				mAquariumFish.Add( (Int32)row.Item.Row );
+			}
+		};
+
+		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
+		mAquariumFish.RemoveWhere( x => ( x < 100 ) );
+
+		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
+		{
+			string itemIDs = "";
+			foreach( var item in mAquariumFish )
+			{
+				itemIDs += item + ", ";
+			}
+			DalamudAPI.PluginLog.Debug( $"Loaded aquarium fish item IDs: {itemIDs}" );
+		}
 	}
 
 	private static readonly HashSet<Int32> mGCItems = new();
