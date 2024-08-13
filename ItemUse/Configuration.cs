@@ -21,6 +21,7 @@ public class Configuration : IPluginConfiguration
 	{
 		mPluginInterface.SavePluginConfig( this );
 	}
+
 	public int Version { get; set; } = 0;
 
 	[NonSerialized]
@@ -30,5 +31,15 @@ public class Configuration : IPluginConfiguration
 
 	#region Options
 
+	public bool mShowCombinedUsefulFlag = false;
+	public bool mShowGCItemsFlag = true;
+	public bool mShowLeveItemsFlag = true;
+	public bool mShowCraftingMaterialsFlag = true;
+	public bool mShowAquariumFishFlag = true;
+
+	public byte mGrandCompany = 1;
+
+	public bool mHighlightCraftingMaterialText = false;
+	public bool mHighlightAquariumFishText = false;
 	#endregion
 }

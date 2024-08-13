@@ -43,7 +43,7 @@ public sealed class Plugin : IDalamudPlugin
 
 		//	Other Initialization
 		ItemCategorizer.Init();
-		ItemDetailHandler.Init();
+		ItemDetailHandler.Init( mConfiguration );
 
 		//	UI Initialization
 		mUI = new PluginUI( this, mConfiguration, pluginInterface );

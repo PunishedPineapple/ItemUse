@@ -14,6 +14,7 @@ using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
 using ImGuiNET;
+using Dalamud.Interface.Utility;
 
 namespace ItemUse;
 
@@ -36,7 +37,25 @@ public class Window_Settings : Window, IDisposable
 
 	public override void Draw()
 	{
-		ImGui.Text( "TODO: Placeholder for settings." );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for GC Items", "Show Flag for GC Items" ) + "###ShowGCItemsFlagCheckbox", ref mConfiguration.mShowGCItemsFlag );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for Leve Items", "Show Flag for Leve Items" ) + "###ShowLeveItemsFlagCheckbox", ref mConfiguration.mShowLeveItemsFlag );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for Crafting Materials", "Show Flag for Crafting Materials" ) + "###ShowCraftingMaterialsFlagCheckbox", ref mConfiguration.mShowCraftingMaterialsFlag );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for AquariumFish", "Show Flag for Aquarium Fish" ) + "###ShowAquariumFishFlagCheckbox", ref mConfiguration.mShowAquariumFishFlag );
+
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Combine Flags", "Combine all Flags" ) + "###CombineFlagsCheckbox", ref mConfiguration.mShowCombinedUsefulFlag );
+		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Combine Flags", "Instead of displaying separate flags for each item type, just shows a single star flag to indicate that an item is \"useful\"." ) );
+
+		ImGui.Spacing();
+		ImGui.Spacing();
+		ImGui.Spacing();
+		ImGui.Spacing();
+		ImGui.Spacing();
+
+		ImGui.Text( Loc.Localize( "Settings: Text - Grand Company", "Grand Company" ) );
+		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Grand Company", "Which grand company symbol to use when showing items that are for GC deliveries." ) );
+		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Maelstrom", "The Maelstrom" ) + "###GCButtonMaelstrom", mConfiguration.mGrandCompany == 1 ) ) mConfiguration.mGrandCompany = 1;
+		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Adders", "The Twin Adders" ) + "###GCButtonAdders", mConfiguration.mGrandCompany == 2 ) ) mConfiguration.mGrandCompany = 2;
+		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Flames", "The Immortal Flames" ) + "###GCButtonFlames", mConfiguration.mGrandCompany == 3 ) ) mConfiguration.mGrandCompany = 3;
 
 		ImGui.Spacing();
 		ImGui.Spacing();

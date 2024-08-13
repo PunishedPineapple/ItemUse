@@ -3,31 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Dalamud.Game.Text.SeStringHandling;
 
 namespace ItemUse;
 
 internal unsafe static class ItemDetailHandler
 {
-	internal static void Init()
+	internal static void Init( Configuration configuration )
 	{
+		mConfiguration = configuration;
+
+		mpItemFlagsString = (byte*)Marshal.AllocHGlobal( mItemFlagsStringMaxLength + 1 );
+		if( mpItemFlagsString == null ) throw new Exception( "Unable to allocate text node string memory." );
+		else Marshal.WriteByte( (nint)mpItemFlagsString, 0 );
+
 		DalamudAPI.AddonLifecycle.RegisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
 	}
 
 	internal static void Uninit()
 	{
-
+		DalamudAPI.AddonLifecycle.UnregisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
+		mConfiguration = null;
+		if( mpItemFlagsString != null ) Marshal.FreeHGlobal( (nint)mpItemFlagsString );
 	}
 
 	private static void ItemDetailUpdateCallback( AddonEvent type, AddonArgs args )
 	{
 		UpdateCurrentItemInfo();
-		UpdateItemFlagsTextNode( GetItemFlagsString() );
+		SetItemFlagsString( CurrentItemInfo );
+		UpdateItemFlagsTextNode();
 	}
 
 	internal static void UpdateCurrentItemInfo()
@@ -45,7 +57,7 @@ internal unsafe static class ItemDetailHandler
 		}
 	}
 
-	private unsafe static void UpdateItemFlagsTextNode( string str, bool show = true )
+	private unsafe static void UpdateItemFlagsTextNode( bool show = true )
 	{
 		AtkUnitBase* pAddon = (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" );
 		AtkTextNode* pNode = null;
@@ -53,6 +65,7 @@ internal unsafe static class ItemDetailHandler
 		AtkResNode* pIconsContainerNode = null;
 		AtkResNode* pOtherFlagsLeftmostNode = null;
 		AtkResNode* pOtherFlagsRightmostNode = null;
+		AtkTextNode* pItemQuantityTextNode = null;
 
 		if( pAddon != null )
 		{
@@ -62,11 +75,13 @@ internal unsafe static class ItemDetailHandler
 			pIconsContainerNode = pAddon->GetNodeById( mIconsContainerResNodeID );
 			pOtherFlagsLeftmostNode = pAddon->GetNodeById( mItemFlagsLeftmostIconResNodeID );
 			pOtherFlagsRightmostNode = pAddon->GetNodeById( mItemFlagsRightmostIconResNodeID );
+			var pItemQuantityTextNodeAsRes = pAddon->GetNodeById( mItemQuantityTextNodeID );
+			if( pItemQuantityTextNodeAsRes != null ) pItemQuantityTextNode = pItemQuantityTextNodeAsRes->GetAsAtkTextNode();
 
 			//	If we have our node, set the colors, size, and text from settings.
 			if( pNode != null )
 			{
-				bool haveRequiredNodes = pTitleBarNode != null && pIconsContainerNode != null && pOtherFlagsLeftmostNode != null && pOtherFlagsRightmostNode != null;
+				bool haveRequiredNodes = pTitleBarNode != null && pIconsContainerNode != null && pOtherFlagsLeftmostNode != null && pOtherFlagsRightmostNode != null && pItemQuantityTextNode != null;
 				bool otherIconsVisible =  haveRequiredNodes && pTitleBarNode->IsVisible() && pIconsContainerNode->IsVisible() && pOtherFlagsLeftmostNode->IsVisible();
 				bool visible = show && haveRequiredNodes;
 
@@ -84,25 +99,27 @@ internal unsafe static class ItemDetailHandler
 
 					pNode->AtkResNode.Color.A = 255;
 
-					pNode->TextColor.A = 255;
-					pNode->TextColor.R = 255;
-					pNode->TextColor.G = 255;
-					pNode->TextColor.B = 255;
+					pNode->TextColor.A = pItemQuantityTextNode->TextColor.A;
+					pNode->TextColor.R = pItemQuantityTextNode->TextColor.R;
+					pNode->TextColor.G = pItemQuantityTextNode->TextColor.G;
+					pNode->TextColor.B = pItemQuantityTextNode->TextColor.B;
 
-					pNode->EdgeColor.A = 255;
-					pNode->EdgeColor.R = 0;
-					pNode->EdgeColor.G = 0;
-					pNode->EdgeColor.B = 0;
+					pNode->EdgeColor.A = pItemQuantityTextNode->EdgeColor.A;
+					pNode->EdgeColor.R = pItemQuantityTextNode->EdgeColor.R;
+					pNode->EdgeColor.G = pItemQuantityTextNode->EdgeColor.G;
+					pNode->EdgeColor.B = pItemQuantityTextNode->EdgeColor.B;
 
 					pNode->FontSize = 14;
 					pNode->AlignmentType = AlignmentType.BottomRight;
 					pNode->FontType = FontType.Axis;
+					pNode->TextFlags = (byte)TextFlags.Bold;
 					pNode->LineSpacing = 1;
 					pNode->CharSpacing = 1;
 
-					pNode->SetText( str );
+					pNode->SetText( mpItemFlagsString );
 				}
 			}
+
 			//	Set up the node if it hasn't been.
 			else if( pAddon->RootNode != null )
 			{
@@ -111,26 +128,49 @@ internal unsafe static class ItemDetailHandler
 		}
 	}
 
-	private static string GetItemFlagsString()
-	{
-		return GetItemFlagsString( CurrentItemInfo );
-	}
-
 	//***** TODO: Eventually get rid of this and make them icons.
-	private static string GetItemFlagsString( ItemInfo itemInfo )
+	private static void SetItemFlagsString( ItemInfo itemInfo )
 	{
-		string str = "";
+		SeStringBuilder str = new();
 
-		if( itemInfo?.IsGCItem ?? false ) str += "G";
-		if( itemInfo?.IsLeveItem ?? false ) str += "L";
-		if( itemInfo?.IsCraftingMaterial ?? false ) str += "C";
-		if( itemInfo?.IsAquariumFish ?? false ) str += "A";
+		//***** TODO: Can't find the player's GC in Dalamud anywhere (and not cleanly in ClientStructs).  Figure that out instead of using a manual config option.
+		var GCIcon = mConfiguration.mGrandCompany switch
+		{
+			2 => BitmapFontIcon.BlackShroud,
+			3 => BitmapFontIcon.Thanalan,
+			_ => BitmapFontIcon.LaNoscea
+		};
 
-		return str;
+		if( mConfiguration.mShowGCItemsFlag && ( itemInfo?.IsGCItem ?? false ) ) str.Add( new IconPayload( GCIcon ) );
+		if( mConfiguration.mShowLeveItemsFlag && ( itemInfo?.IsLeveItem ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Dice ) );
+		if( mConfiguration.mShowCraftingMaterialsFlag && ( itemInfo?.IsCraftingMaterial ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Crafter ) );
+		if( mConfiguration.mShowAquariumFishFlag && ( itemInfo?.IsAquariumFish ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Fisher ) );
+
+		//	Combine all of the flags into one thing if desired.
+		if( str.BuiltString.Payloads.Count > 0 && mConfiguration.mShowCombinedUsefulFlag )
+		{
+			str = new();
+			str.Add( new IconPayload( BitmapFontIcon.GoldStar ) );
+		}
+
+		byte[] encodedStr = str.BuiltString.EncodeWithNullTerminator();
+		if( encodedStr.Length <= mItemFlagsStringMaxLength )
+		{
+			Marshal.Copy( encodedStr, 0, (nint)mpItemFlagsString, encodedStr.Length );
+		}
+		else
+		{
+			Marshal.WriteByte( (nint)mpItemFlagsString, 0 );
+		}
 	}
 
 	private static Int32 mCurrentItemID = 0;
 	internal static ItemInfo CurrentItemInfo { get; private set; } = null;
+
+	private static Configuration mConfiguration = null;
+
+	private static byte* mpItemFlagsString = null;
+	private const int mItemFlagsStringMaxLength = 255;	//	Doesn't matter that much; just something that will stay out of the way, but is not insane.
 
 	//	Note: Node IDs only need to be unique within a given addon.
 	internal const uint mItemFlagsTextNodeID = 0x6C38B300;    //YOLO hoping for no collisions.
@@ -138,4 +178,5 @@ internal unsafe static class ItemDetailHandler
 	internal const uint mIconsContainerResNodeID = 24;
 	internal const uint mItemFlagsRightmostIconResNodeID = 29;
 	internal const uint mItemFlagsLeftmostIconResNodeID = 25;
+	internal const uint mItemQuantityTextNodeID = 33;
 }

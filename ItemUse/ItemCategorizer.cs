@@ -208,7 +208,15 @@ internal static class ItemCategorizer
 
 	private static void InitCraftingItems()
 	{
+		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
 
+		foreach( var row in itemSheet )
+		{
+			if( row.FilterGroup == 12 )
+			{
+				mCraftingItems.Add( (Int32)row.RowId );
+			}
+		}
 	}
 
 	private static void InitAquariumFish()
