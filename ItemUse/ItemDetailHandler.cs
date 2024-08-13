@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Dalamud.Game.Text.SeStringHandling;
 
 namespace ItemUse;
 
@@ -95,7 +90,7 @@ internal unsafe static class ItemDetailHandler
 					int xPos = pOtherFlagsLeftmostNode->IsVisible() ? pOtherFlagsLeftmostNode->GetXShort() : ( pOtherFlagsRightmostNode->GetXShort() + pOtherFlagsRightmostNode->Width );
 					int yPos = pOtherFlagsLeftmostNode->GetYShort() + pOtherFlagsLeftmostNode->GetHeight();
 
-					pNode->AtkResNode.SetPositionShort( (short)(xPosBase + xPos - pNode->Width), (short)(yPosBase + yPos - pNode->Height) );
+					pNode->AtkResNode.SetPositionShort( (short)( xPosBase + xPos - pNode->Width ), (short)( yPosBase + yPos - pNode->Height ) );
 
 					pNode->AtkResNode.Color.A = 255;
 
@@ -128,7 +123,7 @@ internal unsafe static class ItemDetailHandler
 		}
 	}
 
-	//***** TODO: Eventually get rid of this and make them icons.
+	//***** TODO: Probably eventually get rid of this and make them real icons.
 	private static void SetItemFlagsString( ItemInfo itemInfo )
 	{
 		SeStringBuilder str = new();
@@ -173,7 +168,7 @@ internal unsafe static class ItemDetailHandler
 	private const int mItemFlagsStringMaxLength = 255;	//	Doesn't matter that much; just something that will stay out of the way, but is not insane.
 
 	//	Note: Node IDs only need to be unique within a given addon.
-	internal const uint mItemFlagsTextNodeID = 0x6C38B300;    //YOLO hoping for no collisions.
+	internal const uint mItemFlagsTextNodeID = 0x6C38B300;	//YOLO hoping for no collisions.
 	internal const uint mTitleBarResNodeID = 17;
 	internal const uint mIconsContainerResNodeID = 24;
 	internal const uint mItemFlagsRightmostIconResNodeID = 29;

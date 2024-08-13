@@ -1,19 +1,14 @@
 ﻿using System;
+using System.IO;
 using System.Numerics;
 
 using CheapLoc;
 
 using Dalamud.Interface.Windowing;
 
-using Dalamud;
-using Dalamud.Data;
-using Dalamud.Game.Text;
-using Dalamud.Utility;
-
-using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
-
 using ImGuiNET;
+
+using Lumina.Excel.GeneratedSheets;
 
 namespace ItemUse;
 
@@ -26,6 +21,10 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 
 		Size = new Vector2( 232, 90 );
 		SizeCondition = ImGuiCond.FirstUseEver;
+
+		mPlugin = plugin;
+		mPluginUI = pluginUI;
+		mConfiguration = configuration;
 	}
 
 	public void Dispose()
@@ -35,6 +34,11 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 
 	public override void Draw()
 	{
+		if( ImGui.Button( "Export Localizable Strings" ) )
+		{
+			mPlugin.ExportLocalizableStrings();
+		}
+
 		var itemInfo = ItemDetailHandler.CurrentItemInfo;
 
 		if( itemInfo != null )
@@ -55,7 +59,7 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 		}
 	}
 
-	private Plugin mPlugin;
-	private PluginUI mPluginUI;
-	private Configuration mConfiguration;
+	private readonly Plugin mPlugin;
+	private readonly PluginUI mPluginUI;
+	private readonly Configuration mConfiguration;
 }

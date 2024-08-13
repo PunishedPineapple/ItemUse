@@ -125,7 +125,7 @@ internal static class ImGuiUtils
 		var storedCursorPos = ImGui.GetCursorPos();
 		if( iconFont != null ) ImGui.PushFont( iconFont.Value );
 		ImGui.PushClipRect( ImGui.GetWindowPos(), ImGui.GetWindowPos() + ImGui.GetWindowSize(), false );
-		
+
 		try
 		{
 			string buttonText = iconFont != null ? "\uF059" : "(?)";

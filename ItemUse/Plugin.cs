@@ -1,27 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 using CheapLoc;
 
-using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Command;
-using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Hooking;
-using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
-using Dalamud.Memory;
 using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
-
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
-
-using ItemUse;
-
-using Lumina.Excel.GeneratedSheets;
 
 namespace ItemUse;
 
@@ -33,7 +16,7 @@ public sealed class Plugin : IDalamudPlugin
 		//	API Access
 		pluginInterface.Create<DalamudAPI>();
 		mPluginInterface = pluginInterface;
-		
+
 		//	Configuration
 		mConfiguration = mPluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 		mConfiguration.Initialize( mPluginInterface );
@@ -52,13 +35,11 @@ public sealed class Plugin : IDalamudPlugin
 
 		//	Event Subscription
 		mPluginInterface.LanguageChanged += OnLanguageChanged;
-		DalamudAPI.Framework.Update += OnGameFrameworkUpdate;
 	}
 
 	//	Cleanup
 	public void Dispose()
 	{
-		DalamudAPI.Framework.Update -= OnGameFrameworkUpdate;
 		mPluginInterface.LanguageChanged -= OnLanguageChanged;
 		mPluginInterface.UiBuilder.Draw -= DrawUI;
 		mPluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
@@ -118,21 +99,12 @@ public sealed class Plugin : IDalamudPlugin
 		mUI.Window_Settings.Toggle();
 	}
 
-	unsafe private void OnGameFrameworkUpdate( IFramework framework )
+	internal void ExportLocalizableStrings()
 	{
-		if( !DalamudAPI.ClientState.IsLoggedIn ) return;
-	}
-
-	unsafe private static SeString SeStringDeepCopy( SeString str )
-	{
-		var bytes = str.Encode();
-		SeString newStr;
-		fixed( byte* pBytes = bytes )
-		{
-			newStr = MemoryHelper.ReadSeStringNullTerminated( new IntPtr( pBytes ) );
-		}
-		newStr ??= SeString.Empty;
-		return newStr;
+		string pwd = Directory.GetCurrentDirectory();
+		Directory.SetCurrentDirectory( mPluginInterface.AssemblyLocation.DirectoryName );
+		Loc.ExportLocalizable();
+		Directory.SetCurrentDirectory( pwd );
 	}
 
 	public static string Name => "Item Use";

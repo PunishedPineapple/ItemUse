@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Dalamud.Configuration;
-using Dalamud.Game.Text;
 using Dalamud.Plugin;
 
 namespace ItemUse;

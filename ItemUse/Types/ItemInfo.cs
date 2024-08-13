@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using FFXIVClientStructs.FFXIV.Client.UI.Info;
 
 namespace ItemUse;
 
 internal class ItemInfo
 {
-	internal ItemInfo( Int32 itemID, bool isGCItem, bool isLeveItem, bool isCraftingMaterial, bool isAquariumFish, IEnumerable<Int32> cofferGCJobs, IEnumerable<Int32> cofferLeveJobs  )
+	internal ItemInfo( Int32 itemID, bool isGCItem, bool isLeveItem, bool isCraftingMaterial, bool isAquariumFish, IEnumerable<Int32> cofferGCJobs, IEnumerable<Int32> cofferLeveJobs )
 	{
 		ItemID = itemID;
 		IsGCItem = isGCItem;

@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Numerics;
 
 using CheapLoc;
 
 using Dalamud.Interface.Windowing;
 
-using Dalamud;
-using Dalamud.Data;
-using Dalamud.Game.Text;
-using Dalamud.Utility;
-
-using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
-
 using ImGuiNET;
-using Dalamud.Interface.Utility;
 
 namespace ItemUse;
 
@@ -75,7 +65,7 @@ public class Window_Settings : Window, IDisposable
 		}
 	}
 
-	private Plugin mPlugin;
-	private PluginUI mPluginUI;
-	private Configuration mConfiguration;
+	private readonly Plugin mPlugin;
+	private readonly PluginUI mPluginUI;
+	private readonly Configuration mConfiguration;
 }

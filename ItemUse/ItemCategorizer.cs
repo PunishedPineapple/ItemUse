@@ -1,20 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using CheapLoc;
-
-using Dalamud;
-using Dalamud.Data;
-using Dalamud.Game.Text;
-using Dalamud.Utility;
-
-using Lumina;
-using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
 using Serilog.Events;
@@ -38,16 +24,20 @@ internal static class ItemCategorizer
 
 	internal static ItemInfo GetItemInfo( Int32 item )
 	{
+		//	Handle HQ items.
+		var itemNQ = item;
+		if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
+
 		//***** TODO: Cache items that have already been hovered to reduce time spent checking the lists.
 
 		//***** TODO: Handle coffer stuff.
 
 		return new(
 			item,
-			IsGCItem( item ),
-			IsLeveItem( item ),
-			IsCraftingItem( item ),
-			IsAquariumFish( item ),
+			IsGCItem( itemNQ ),
+			IsLeveItem( itemNQ ),
+			IsCraftingItem( itemNQ ),
+			IsAquariumFish( itemNQ ),
 			null,
 			null );
 	}
