@@ -1,13 +1,12 @@
 {
   "Author": "PunishedPineapple",
   "Name": "Item Use",
-  "Punchline": "Easily see common item purposes.",
+  "Punchline": "Easily see common item uses.",
   "Description": "Displays indicators in the item help popup for when an item is useful for leves, GC dailies, etc. to help you decide what is worth keeping, selling, or taking as a reward.",
   "RepoUrl": "https://github.com/PunishedPineapple/ItemUse",
   "IconUrl": "https://github.com/PunishedPineapple/ItemUse/raw/main/docs/Images/icon.png",
   "ImageUrls": [
     "https://github.com/PunishedPineapple/ItemUse/raw/main/docs/Images/image1.png",
-    "https://github.com/PunishedPineapple/ItemUse/raw/main/docs/Images/image2.png"
   ],
   "Tags": [ "Item", "Inventory", "Leve", "Levequest", "GC", "Grand Company", "Aquarium", "Crafting" ]
 }
