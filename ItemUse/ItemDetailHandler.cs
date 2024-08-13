@@ -27,6 +27,7 @@ internal unsafe static class ItemDetailHandler
 	{
 		DalamudAPI.AddonLifecycle.UnregisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
 		mConfiguration = null;
+		AtkNodeHelpers.RemoveTextNode( (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ), mItemFlagsTextNodeID );
 		if( mpItemFlagsString != null ) Marshal.FreeHGlobal( (nint)mpItemFlagsString );
 	}
 
@@ -64,7 +65,6 @@ internal unsafe static class ItemDetailHandler
 
 		if( pAddon != null )
 		{
-			//	Find our node by ID.  Doing this allows us to not have to deal with freeing the node resources and removing connections to sibling nodes (we'll still leak, but only once).
 			pNode = AtkNodeHelpers.GetTextNodeByID( pAddon, mItemFlagsTextNodeID );
 			pTitleBarNode = pAddon->GetNodeById( mTitleBarResNodeID );
 			pIconsContainerNode = pAddon->GetNodeById( mIconsContainerResNodeID );

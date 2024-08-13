@@ -1,4 +1,6 @@
-﻿using FFXIVClientStructs.FFXIV.Client.System.Memory;
+﻿using System;
+
+using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace ItemUse;
@@ -53,6 +55,46 @@ internal static unsafe class AtkNodeHelpers
 			}
 
 			pAddon->UldManager.UpdateDrawNodeList();
+		}
+	}
+
+	internal static void RemoveTextNode( AtkUnitBase* pAddon, uint nodeID )
+	{
+		if( pAddon == null ) return;
+
+		var pNode = GetTextNodeByID( pAddon, nodeID );
+
+		if( pNode != null )
+		{
+			RemoveTextNode( pAddon, pNode->GetAsAtkTextNode() );
+		}
+		else
+		{
+			DalamudAPI.PluginLog.Error( $"Unable to locate text node with an ID of {nodeID} in the addon at 0x{(nint)pAddon:X}" );
+		}
+	}
+
+	internal static void RemoveTextNode( AtkUnitBase* pAddon, AtkTextNode* pNode )
+	{
+		if( pAddon == null ) return;
+
+		if( pNode != null )
+		{
+			try
+			{
+				var pPrevSiblingNode = pNode->AtkResNode.PrevSiblingNode;
+				var pNextSiblingNode = pNode->AtkResNode.NextSiblingNode;
+
+				if( pPrevSiblingNode != null ) pPrevSiblingNode->NextSiblingNode = pNextSiblingNode;
+				if( pNextSiblingNode != null ) pNextSiblingNode->PrevSiblingNode = pPrevSiblingNode;
+
+				pAddon->UldManager.UpdateDrawNodeList();
+				pNode->AtkResNode.Destroy( true );
+			}
+			catch( Exception e )
+			{
+				DalamudAPI.PluginLog.Error( $"Unknown error while removing text node {(nint)pNode:X} from the addon at 0x{(nint)pAddon:X}:\r\n{e}" );
+			}
 		}
 	}
 
