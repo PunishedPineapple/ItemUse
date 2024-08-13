@@ -138,6 +138,7 @@ internal unsafe static class ItemDetailHandler
 
 		if( mConfiguration.mShowGCItemsFlag && ( itemInfo?.IsGCItem ?? false ) ) str.Add( new IconPayload( GCIcon ) );
 		if( mConfiguration.mShowLeveItemsFlag && ( itemInfo?.IsLeveItem ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Dice ) );
+		if( mConfiguration.mShowEhcatlItemsFlag && ( itemInfo?.IsEhcatlItem ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.FlyZone ) );
 		if( mConfiguration.mShowCraftingMaterialsFlag && ( itemInfo?.IsCraftingMaterial ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Crafter ) );
 		if( mConfiguration.mShowAquariumFishFlag && ( itemInfo?.IsAquariumFish ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Fisher ) );
 

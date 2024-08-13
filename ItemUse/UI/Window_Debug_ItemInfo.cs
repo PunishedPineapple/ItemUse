@@ -50,6 +50,7 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			ImGui.Text( $"Item Name: {itemName}" );
 			ImGui.Text( $"GC: {itemInfo.IsGCItem}" );
 			ImGui.Text( $"Leve: {itemInfo.IsLeveItem}" );
+			ImGui.Text( $"Ehcatl: {itemInfo.IsEhcatlItem}" );
 			ImGui.Text( $"Crafting: {itemInfo.IsCraftingMaterial}" );
 			ImGui.Text( $"Aquarium: {itemInfo.IsAquariumFish}" );
 		}

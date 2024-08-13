@@ -5,13 +5,14 @@ namespace ItemUse;
 
 internal class ItemInfo
 {
-	internal ItemInfo( Int32 itemID, bool isGCItem, bool isLeveItem, bool isCraftingMaterial, bool isAquariumFish, IEnumerable<Int32> cofferGCJobs, IEnumerable<Int32> cofferLeveJobs )
+	internal ItemInfo( Int32 itemID, bool isGCItem, bool isLeveItem, bool isCraftingMaterial, bool isAquariumFish, bool isEhcatlItem, IEnumerable<Int32> cofferGCJobs, IEnumerable<Int32> cofferLeveJobs )
 	{
 		ItemID = itemID;
 		IsGCItem = isGCItem;
 		IsLeveItem = isLeveItem;
 		IsCraftingMaterial = isCraftingMaterial;
 		IsAquariumFish = isAquariumFish;
+		IsEhcatlItem = isEhcatlItem;
 
 		if( cofferGCJobs != null )
 		{
@@ -31,6 +32,7 @@ internal class ItemInfo
 	internal bool IsLeveItem { get; private set; } = false;
 	internal bool IsCraftingMaterial { get; private set; } = false;
 	internal bool IsAquariumFish { get; private set; } = false;
+	internal bool IsEhcatlItem { get; private set; } = false;
 
 	internal List<Int32> CofferGCJobs { get; private set; } = null;
 	internal List<Int32> CofferLeveJobs { get; private set; } = null;

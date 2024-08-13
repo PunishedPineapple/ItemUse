@@ -34,6 +34,7 @@ public class Configuration : IPluginConfiguration
 	public bool mShowLeveItemsFlag = true;
 	public bool mShowCraftingMaterialsFlag = true;
 	public bool mShowAquariumFishFlag = true;
+	public bool mShowEhcatlItemsFlag = false;
 
 	public byte mGrandCompany = 1;
 

@@ -15,6 +15,7 @@ internal static class ItemCategorizer
 		InitLeveItems();
 		InitCraftingItems();
 		InitAquariumFish();
+		InitEhcatlItems();
 	}
 
 	internal static void Uninit()
@@ -24,22 +25,33 @@ internal static class ItemCategorizer
 
 	internal static ItemInfo GetItemInfo( Int32 item )
 	{
-		//	Handle HQ items.
-		var itemNQ = item;
-		if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
+		//	Cache item info when we compute it to save lookup time in the future.
+		if( mItemInfoCache.TryGetValue( item, out var cachedInfo ) && cachedInfo != null )
+		{
+			return cachedInfo;
+		}
+		else
+		{
+			//	Handle HQ items.
+			var itemNQ = item;
+			if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
 
-		//***** TODO: Cache items that have already been hovered to reduce time spent checking the lists.
+			//***** TODO: Handle coffer stuff.
 
-		//***** TODO: Handle coffer stuff.
+			ItemInfo newInfo = new(
+				item,
+				IsGCItem( itemNQ ),
+				IsLeveItem( itemNQ ),
+				IsCraftingItem( itemNQ ),
+				IsAquariumFish( itemNQ ),
+				IsEhcatlItem( itemNQ ),
+				null,
+				null );
 
-		return new(
-			item,
-			IsGCItem( itemNQ ),
-			IsLeveItem( itemNQ ),
-			IsCraftingItem( itemNQ ),
-			IsAquariumFish( itemNQ ),
-			null,
-			null );
+			mItemInfoCache.TryAdd( item, newInfo );
+
+			return newInfo;
+		}
 	}
 
 	internal static bool IsGCItem( Int32 item )
@@ -60,6 +72,11 @@ internal static class ItemCategorizer
 	internal static bool IsAquariumFish( Int32 item )
 	{
 		return mAquariumFish?.Contains( item ) ?? false;
+	}
+
+	internal static bool IsEhcatlItem( Int32 item )
+	{
+		return mEhcatlItems?.Contains( item ) ?? false;
 	}
 
 	private static void InitGCItems()
@@ -235,8 +252,44 @@ internal static class ItemCategorizer
 		}
 	}
 
+	private static void InitEhcatlItems()
+	{
+		var ehcatlSheet = DalamudAPI.DataManager.GetExcelSheet<DailySupplyItem>();
+
+		foreach( var row in ehcatlSheet )
+		{
+			HashSet<Int32> rowData = new();
+
+			if( row?.UnkData0 != null )
+			{
+				foreach( var entry in row.UnkData0 )
+				{
+					rowData.Add( entry.Item );
+				}
+			}
+
+			mEhcatlItems.UnionWith( rowData );
+		};
+
+		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
+		mEhcatlItems.RemoveWhere( x => ( x < 100 ) );
+
+		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
+		{
+			string itemIDs = "";
+			foreach( var item in mEhcatlItems )
+			{
+				itemIDs += item + ", ";
+			}
+			DalamudAPI.PluginLog.Debug( $"Loaded Ehcatl item IDs: {itemIDs}" );
+		}
+	}
+
 	private static readonly HashSet<Int32> mGCItems = new();
 	private static readonly HashSet<Int32> mLeveItems = new();
 	private static readonly HashSet<Int32> mCraftingItems = new();
 	private static readonly HashSet<Int32> mAquariumFish = new();
+	private static readonly HashSet<Int32> mEhcatlItems = new();
+
+	private static readonly SortedDictionary<Int32, ItemInfo> mItemInfoCache = new();
 }
