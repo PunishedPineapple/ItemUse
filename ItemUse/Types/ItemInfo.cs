@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ItemUse;
 
@@ -14,18 +15,11 @@ internal class ItemInfo
 		IsAquariumFish = isAquariumFish;
 		IsEhcatlItem = isEhcatlItem;
 
-		if( cofferGCJobs != null )
-		{
-			CofferGCJobs = new( cofferGCJobs );
-		}
-
-		if( cofferLeveJobs != null )
-		{
-			CofferLeveJobs = new( cofferLeveJobs );
-		}
+		if( cofferGCJobs != null ) mCofferGCJobs = cofferGCJobs.ToArray();
+		if( cofferLeveJobs != null ) mCofferLeveJobs = cofferLeveJobs.ToArray();
 	}
 
-	private ItemInfo() {}
+	protected ItemInfo() { }
 
 	internal Int32 ItemID { get; private set; } = 0;
 	internal bool IsGCItem { get; private set; } = false;
@@ -34,6 +28,9 @@ internal class ItemInfo
 	internal bool IsAquariumFish { get; private set; } = false;
 	internal bool IsEhcatlItem { get; private set; } = false;
 
-	internal List<Int32> CofferGCJobs { get; private set; } = null;
-	internal List<Int32> CofferLeveJobs { get; private set; } = null;
+	internal ReadOnlySpan<Int32> CofferGCJobs => new( mCofferGCJobs );
+	internal ReadOnlySpan<Int32> CofferLeveJobs => new( mCofferLeveJobs );
+
+	protected Int32[] mCofferGCJobs = null;
+	protected Int32[] mCofferLeveJobs = null;
 }

@@ -25,6 +25,7 @@ public sealed class Plugin : IDalamudPlugin
 		OnLanguageChanged( mPluginInterface.UiLanguage );
 
 		//	Other Initialization
+		CofferManifests.Init( Path.Join( mPluginInterface.AssemblyLocation.DirectoryName, "Resources\\CofferManifests.csv" ) );
 		ItemCategorizer.Init();
 		ItemDetailHandler.Init( mConfiguration );
 
@@ -47,6 +48,7 @@ public sealed class Plugin : IDalamudPlugin
 
 		ItemDetailHandler.Uninit();
 		ItemCategorizer.Uninit();
+		CofferManifests.Uninit();
 
 		mUI?.Dispose();
 	}

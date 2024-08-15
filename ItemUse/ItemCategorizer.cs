@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Lumina.Excel.GeneratedSheets;
 
@@ -36,7 +37,8 @@ internal static class ItemCategorizer
 			var itemNQ = item;
 			if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
 
-			//***** TODO: Handle coffer stuff.
+			//	Handle coffer stuff.
+			bool itemIsCoffer = CofferManifests.ItemIsKnownCoffer( item );
 
 			ItemInfo newInfo = new(
 				item,
@@ -45,8 +47,8 @@ internal static class ItemCategorizer
 				IsCraftingItem( itemNQ ),
 				IsAquariumFish( itemNQ ),
 				IsEhcatlItem( itemNQ ),
-				null,
-				null );
+				itemIsCoffer ? CofferManifests.GetGCJobsForCoffer( item ) : null,
+				itemIsCoffer ? CofferManifests.GetLeveJobsForCoffer( item ) : null );
 
 			mItemInfoCache.TryAdd( item, newInfo );
 
@@ -79,6 +81,25 @@ internal static class ItemCategorizer
 		return mEhcatlItems?.Contains( item ) ?? false;
 	}
 
+	internal static HashSet<int> GetJobsForItem( Int32 itemID )
+	{
+		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
+		var classJobSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
+		var classjobCategorySheet = DalamudAPI.DataManager.GetExcelSheet<ClassJobCategory_Alternate>();
+
+		var classJobCategoryRowID = itemSheet.GetRow( (uint)itemID )?.ClassJobCategory?.Value?.RowId ?? 0;
+		var classJobFlags = classjobCategorySheet.GetRow( classJobCategoryRowID )?.mClassJobFlags;
+
+		HashSet<int> classJobs = new();
+
+		for( int i = 0; i < classJobFlags?.Count; ++i )
+		{
+			if( classJobFlags[i] ) classJobs.Add( i );
+		}
+
+		return classJobs;
+	}
+
 	private static void InitGCItems()
 	{
 		var GCSupplySheet = DalamudAPI.DataManager.GetExcelSheet<GCSupplyDuty>();
@@ -87,6 +108,7 @@ internal static class ItemCategorizer
 		{
 			HashSet<Int32> rowData = new();
 
+			//***** TODO: Make our own sheet definition for this maybe.
 			//	Lumina has this sheet defined kind of questionably.
 			try
 			{

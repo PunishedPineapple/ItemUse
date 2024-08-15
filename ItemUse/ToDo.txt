@@ -2,10 +2,15 @@
 
 To Do:
 	- Icon for leves
-	- Icon for GC
+	- Automatically determine GC.
 	- Can we easily highlight the "Crafting Material" and aquarium text in the tooltip?
-	- Allow hightlighting item name text in a specified color for a given category.
+		-This is pulled from the Addon sheet (entry 996 for crafting materials).
+		-Can we hook where it's grabbed and add in color payloads there rather than editing the ATKArrayData?
+	- Allow hightlighting item name text in a specified color for a given category?
 	- Handle coffer manifests (show job(s) for which a coffer will produce a GC/leve item).
 		- Since it's manually-compiled data, do automatic updates like distances, or just package with the plugin and re-release each time?
+	- Handle PLD arms items.
+		- Do this as part of coffer manifests, or separately to just have the regular flags and make it cleaner?
+			-Or have a separate flag?
 
 Notes:

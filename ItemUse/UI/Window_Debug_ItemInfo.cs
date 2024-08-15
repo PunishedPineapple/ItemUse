@@ -53,6 +53,14 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			ImGui.Text( $"Ehcatl: {itemInfo.IsEhcatlItem}" );
 			ImGui.Text( $"Crafting: {itemInfo.IsCraftingMaterial}" );
 			ImGui.Text( $"Aquarium: {itemInfo.IsAquariumFish}" );
+
+			var jobs = ItemCategorizer.GetJobsForItem( itemInfo.ItemID );
+			string str = "";
+			foreach( var job in jobs )
+			{
+				str += job + ", ";
+			}
+			ImGui.Text( $"Jobs: {str}" );
 		}
 		else
 		{
