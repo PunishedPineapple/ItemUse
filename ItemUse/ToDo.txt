@@ -12,5 +12,7 @@ To Do:
 	- Handle PLD arms items.
 		- Do this as part of coffer manifests, or separately to just have the regular flags and make it cleaner?
 			-Or have a separate flag?
+		- These are in the game files with the "AdditionalData" column of the item sheet possibly providing an index into the ArchiveItem sheet.
+			-May be more to it than that, but this is where to pick back up on it later.
 
 Notes:

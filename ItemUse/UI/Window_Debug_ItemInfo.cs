@@ -44,6 +44,8 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 		if( itemInfo != null )
 		{
 			var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
+			var classJobsSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
+
 			var itemName = itemSheet?.GetRow( (UInt32)itemInfo.ItemID )?.Name ?? "Unknown";
 
 			ImGui.Text( $"Item ID: {itemInfo.ItemID}" );
@@ -61,6 +63,36 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 				str += job + ", ";
 			}
 			ImGui.Text( $"Jobs: {str}" );
+
+			if( CofferManifests.ItemIsKnownCoffer( itemInfo.ItemID ) )
+			{
+				string cofferItemsStr = "";
+				foreach( var item in CofferManifests.GetCofferItems( itemInfo.ItemID) )
+				{
+					cofferItemsStr += itemSheet.GetRow( (uint)item ).Singular.ToString() + "\r\n";
+				}
+				ImGui.Text( $"Coffer Items:\r\n{cofferItemsStr}" );
+			}
+
+			if( itemInfo.CofferGCJobs != null )
+			{
+				string cofferGCJobsStr = "";
+				foreach( var job in itemInfo.CofferGCJobs )
+				{
+					cofferGCJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation + "\r\n";
+				}
+				ImGui.Text( $"GC Jobs:\r\n{cofferGCJobsStr}" );
+			}
+
+			if( itemInfo.CofferLeveJobs != null )
+			{
+				string cofferLeveJobsStr = "";
+				foreach( var job in itemInfo.CofferLeveJobs )
+				{
+					cofferLeveJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation + "\r\n";
+				}
+				ImGui.Text( $"Leve Jobs:\r\n{cofferLeveJobsStr}" );
+			}
 		}
 		else
 		{
