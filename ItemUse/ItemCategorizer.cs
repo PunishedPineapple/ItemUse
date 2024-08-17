@@ -189,16 +189,6 @@ internal static class ItemCategorizer
 
 		//	Assume anything less than 100 is a quantity, since leves never require more than low double digits, and items below 100 are reserved for currencies.
 		mGCItems.RemoveWhere( x => ( x < 100 ) );
-
-		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
-		{
-			string itemIDs = "";
-			foreach( var item in mGCItems )
-			{
-				itemIDs += item + ", ";
-			}
-			DalamudAPI.PluginLog.Debug( $"Loaded GC item IDs: {itemIDs}" );
-		}
 	}
 
 	private static void InitLeveItems()
@@ -222,16 +212,6 @@ internal static class ItemCategorizer
 
 		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
 		mLeveItems.RemoveWhere( x => ( x < 100 ) );
-
-		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
-		{
-			string itemIDs = "";
-			foreach( var item in mLeveItems )
-			{
-				itemIDs += item + ", ";
-			}
-			DalamudAPI.PluginLog.Debug( $"Loaded Levequest item IDs: {itemIDs}" );
-		}
 	}
 
 	private static void InitCraftingItems()
@@ -245,6 +225,9 @@ internal static class ItemCategorizer
 				mCraftingItems.Add( (Int32)row.RowId );
 			}
 		}
+
+		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
+		mAquariumFish.RemoveWhere( x => ( x < 100 ) );
 	}
 
 	private static void InitAquariumFish()
@@ -261,16 +244,6 @@ internal static class ItemCategorizer
 
 		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
 		mAquariumFish.RemoveWhere( x => ( x < 100 ) );
-
-		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
-		{
-			string itemIDs = "";
-			foreach( var item in mAquariumFish )
-			{
-				itemIDs += item + ", ";
-			}
-			DalamudAPI.PluginLog.Debug( $"Loaded aquarium fish item IDs: {itemIDs}" );
-		}
 	}
 
 	private static void InitEhcatlItems()
@@ -294,16 +267,6 @@ internal static class ItemCategorizer
 
 		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
 		mEhcatlItems.RemoveWhere( x => ( x < 100 ) );
-
-		if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Debug )
-		{
-			string itemIDs = "";
-			foreach( var item in mEhcatlItems )
-			{
-				itemIDs += item + ", ";
-			}
-			DalamudAPI.PluginLog.Debug( $"Loaded Ehcatl item IDs: {itemIDs}" );
-		}
 	}
 
 	private static readonly HashSet<Int32> mGCItems = new();
