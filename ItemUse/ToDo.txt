@@ -16,5 +16,6 @@ To Do:
 		- Does it really make sense to do, since you can only use them on one job, and you'll basically always just use them?
 	- Flag items above a certain vendor sale gil threshold?
 	- Add debug windows for all of the item type lists and manifests.
+	- Figure out some way to add example icons to the settings menu for each type of flag.
 
 Notes:
