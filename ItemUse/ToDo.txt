@@ -7,12 +7,13 @@ To Do:
 		-This is pulled from the Addon sheet (entry 996 for crafting materials).
 		-Can we hook where it's grabbed and add in color payloads there rather than editing the ATKArrayData?
 	- Allow hightlighting item name text in a specified color for a given category?
-	- Handle coffer manifests (show job(s) for which a coffer will produce a GC/leve item).
-		- Since it's manually-compiled data, do automatic updates like distances, or just package with the plugin and re-release each time?
+	- Get coffer information into a better place visually.
 	- Handle PLD arms items.
 		- Do this as part of coffer manifests, or separately to just have the regular flags and make it cleaner?
 			-Or have a separate flag?
 		- These are in the game files with the "AdditionalData" column of the item sheet possibly providing an index into the ArchiveItem sheet.
 			-May be more to it than that, but this is where to pick back up on it later.
+		- Does it really make sense to do, since you can only use them on one job, and you'll basically always just use them?
+	- Flag items above a certain vendor sale gil threshold?
 
 Notes:

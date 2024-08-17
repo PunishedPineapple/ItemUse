@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Numerics;
 
 using CheapLoc;
@@ -46,6 +45,8 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
 			var classJobsSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
 
+			//***** TODO: Handle HQ items.
+
 			var itemName = itemSheet?.GetRow( (UInt32)itemInfo.ItemID )?.Name ?? "Unknown";
 
 			ImGui.Text( $"Item ID: {itemInfo.ItemID}" );
@@ -60,14 +61,14 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			string str = "";
 			foreach( var job in jobs )
 			{
-				str += job + ", ";
+				str += classJobsSheet.GetRow( (uint)job ).Abbreviation + ", ";
 			}
 			ImGui.Text( $"Jobs: {str}" );
 
 			if( CofferManifests.ItemIsKnownCoffer( itemInfo.ItemID ) )
 			{
 				string cofferItemsStr = "";
-				foreach( var item in CofferManifests.GetCofferItems( itemInfo.ItemID) )
+				foreach( var item in CofferManifests.GetCofferItems( itemInfo.ItemID ) )
 				{
 					cofferItemsStr += itemSheet.GetRow( (uint)item ).Singular.ToString() + "\r\n";
 				}

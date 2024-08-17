@@ -28,8 +28,8 @@ internal class ItemInfo
 	internal bool IsAquariumFish { get; private set; } = false;
 	internal bool IsEhcatlItem { get; private set; } = false;
 
-	internal ReadOnlySpan<Int32> CofferGCJobs => new( mCofferGCJobs );
-	internal ReadOnlySpan<Int32> CofferLeveJobs => new( mCofferLeveJobs );
+	internal HashSet<Int32> CofferGCJobs => mCofferGCJobs != null ? new( mCofferGCJobs ) : null;
+	internal HashSet<Int32> CofferLeveJobs => mCofferGCJobs != null ? new( mCofferLeveJobs ) : null;
 
 	protected Int32[] mCofferGCJobs = null;
 	protected Int32[] mCofferLeveJobs = null;

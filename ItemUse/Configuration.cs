@@ -38,7 +38,13 @@ public class Configuration : IPluginConfiguration
 
 	public byte mGrandCompany = 1;
 
-	public bool mHighlightCraftingMaterialText = false;
-	public bool mHighlightAquariumFishText = false;
+	public bool mShowGCCofferJobs = true;
+	public bool mShowLeveCofferJobs = true;
+	public bool mCombineCofferJobs = false;
+
+	//***** TODO
+	//public bool mHighlightCraftingMaterialText = false;
+	//public bool mHighlightAquariumFishText = false;
+
 	#endregion
 }

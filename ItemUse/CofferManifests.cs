@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace ItemUse;
 
@@ -25,6 +24,7 @@ internal static class CofferManifests
 			{
 				var manifestFile = File.OpenText( filePath );
 
+				//***** TODO: Make this look less like poop.
 				var line = manifestFile.ReadLine();
 				while( line != null )
 				{

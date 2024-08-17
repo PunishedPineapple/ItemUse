@@ -27,6 +27,7 @@ public class Window_Settings : Window, IDisposable
 
 	public override void Draw()
 	{
+		ImGui.Text( Loc.Localize( "Settings: Header - Item Flags", "Item Flags:" ) );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for GC Items", "Show Flag for GC Items" ) + "###ShowGCItemsFlagCheckbox", ref mConfiguration.mShowGCItemsFlag );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for Leve Items", "Show Flag for Leve Items" ) + "###ShowLeveItemsFlagCheckbox", ref mConfiguration.mShowLeveItemsFlag );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Flag for Crafting Materials", "Show Flag for Crafting Materials" ) + "###ShowCraftingMaterialsFlagCheckbox", ref mConfiguration.mShowCraftingMaterialsFlag );
@@ -42,7 +43,19 @@ public class Window_Settings : Window, IDisposable
 		ImGui.Spacing();
 		ImGui.Spacing();
 
-		ImGui.Text( Loc.Localize( "Settings: Text - Grand Company", "Grand Company" ) );
+		ImGui.Text( Loc.Localize( "Settings: Header - Coffer Information:", "Coffer Information" ) );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer GC Items", "Show Jobs with GC Items" ) + "###ShowCofferGCJobsCheckbox", ref mConfiguration.mShowGCCofferJobs );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer Leve Items", "Show Jobs with Leve Items" ) + "###ShowCofferLeveJobsCheckbox", ref mConfiguration.mShowLeveCofferJobs );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Combine Coffer Jobs", "Combine Coffer Jobs" ) + "###CombineCofferJobsCheckbox", ref mConfiguration.mCombineCofferJobs );
+		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Combine Coffer Jobs", "Instead of displaying separate lists for GC deliveries and leves, just shows a single list with a star icon to indicate which jobs produce \"useful\" items when opening the coffer." ) );
+
+		ImGui.Spacing();
+		ImGui.Spacing();
+		ImGui.Spacing();
+		ImGui.Spacing();
+		ImGui.Spacing();
+
+		ImGui.Text( Loc.Localize( "Settings: Text - Grand Company", "Grand Company:" ) );
 		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Grand Company", "Which grand company symbol to use when showing items that are for GC deliveries." ) );
 		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Maelstrom", "The Maelstrom" ) + "###GCButtonMaelstrom", mConfiguration.mGrandCompany == 1 ) ) mConfiguration.mGrandCompany = 1;
 		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Adders", "The Twin Adders" ) + "###GCButtonAdders", mConfiguration.mGrandCompany == 2 ) ) mConfiguration.mGrandCompany = 2;
