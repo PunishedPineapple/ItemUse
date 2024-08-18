@@ -269,6 +269,41 @@ internal static class ItemCategorizer
 		mEhcatlItems.RemoveWhere( x => ( x < 100 ) );
 	}
 
+	internal static List<Int32> DEBUG_GetGCItems()
+	{
+		List<Int32> retVal = new( mGCItems );
+		retVal.Sort();
+		return retVal;
+	}
+
+	internal static List<Int32> DEBUG_GetLeveItems()
+	{
+		List<Int32> retVal = new( mLeveItems );
+		retVal.Sort();
+		return retVal;
+	}
+
+	internal static List<Int32> DEBUG_GetEhcatlItems()
+	{
+		List<Int32> retVal = new( mEhcatlItems );
+		retVal.Sort();
+		return retVal;
+	}
+
+	internal static List<Int32> DEBUG_GetCraftingMaterials()
+	{
+		List<Int32> retVal = new( mCraftingItems );
+		retVal.Sort();
+		return retVal;
+	}
+
+	internal static List<Int32> DEBUG_GetAquariumFish()
+	{
+		List<Int32> retVal = new( mAquariumFish );
+		retVal.Sort();
+		return retVal;
+	}
+
 	private static readonly HashSet<Int32> mGCItems = new();
 	private static readonly HashSet<Int32> mLeveItems = new();
 	private static readonly HashSet<Int32> mCraftingItems = new();

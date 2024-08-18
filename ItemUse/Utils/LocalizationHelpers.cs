@@ -25,9 +25,10 @@ internal static class LocalizationHelpers
 					var addonSheet = DalamudAPI.DataManager.GetExcelSheet<Addon>();
 					mCraftingMaterialTag = addonSheet?.GetRow( 996 )?.Text ?? "Crafting Material";
 				}
-				catch
+				catch( Exception e )
 				{
 					mCraftingMaterialTag =  "You should never see this!";
+					DalamudAPI.PluginLog.Error( $"Unknown error while attempting to retrieve crafting material string:\r\n{e}" );
 				}
 			}
 
@@ -37,7 +38,7 @@ internal static class LocalizationHelpers
 
 	private static string mCraftingMaterialTag = null;
 
-	//	These are pretty lame, but there's not much better way to get these exact strings, since SE just stuffs them right into the description column in the sheet itself.
+	//	These are pretty lame, but there's not a much better way to get these exact strings, since SE just stuffs them right into the description column in the sheet itself.
 	internal static string Grade1AquariumTag =>
 		DalamudAPI.ClientState.ClientLanguage switch
 		{

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace ItemUse;
@@ -94,6 +95,9 @@ internal static class CofferManifests
 
 		return allLeveItemJobs;
 	}
+
+	//***** TODO: The caller can still modify the underlying arrays.  Not a big deal for a debug thing, but fix it at some point.
+	internal static ReadOnlyDictionary<Int32, Int32[]> DEBUG_GetCofferManifests() => new( mCofferManifests );
 
 	private static readonly SortedDictionary<Int32, Int32[]> mCofferManifests = new();
 }

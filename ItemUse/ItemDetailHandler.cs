@@ -22,6 +22,8 @@ internal unsafe static class ItemDetailHandler
 		if( mpItemFlagsString == null ) throw new Exception( "Unable to allocate text node string memory." );
 		else Marshal.WriteByte( (nint)mpItemFlagsString, 0 );
 
+		DalamudAPI.GameGui.HoveredItemChanged += OnHoveredItemChanged;
+
 		IntPtr fpGenerateItemDetail = DalamudAPI.SigScanner.ScanText( "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 20" );
 		if( fpGenerateItemDetail != IntPtr.Zero )
 		{
@@ -40,33 +42,40 @@ internal unsafe static class ItemDetailHandler
 	internal static void Uninit()
 	{
 		mGenerateItemDetailHook?.Disable();
-		
+		mGenerateItemDetailHook?.Dispose();
+
 		DalamudAPI.AddonLifecycle.UnregisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
-
-		mConfiguration = null;
-
+		DalamudAPI.GameGui.HoveredItemChanged -= OnHoveredItemChanged;
 		AtkNodeHelpers.RemoveTextNode( (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ), mItemFlagsTextNodeID );
 
 		if( mpItemFlagsString != null ) Marshal.FreeHGlobal( (nint)mpItemFlagsString );
-
-		mGenerateItemDetailHook?.Dispose();
+		mConfiguration = null;
 	}
 
 	private static void ItemDetailUpdateCallback( AddonEvent type, AddonArgs args )
 	{
-		//UpdateCurrentItemInfo();
 		SetItemFlagsString( CurrentItemInfo );
 		UpdateItemFlagsTextNode();
 	}
 
-	internal static unsafe nint GenerateItemDetailDetour( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData )
+	private static unsafe nint GenerateItemDetailDetour( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData )
 	{
+		try
+		{
+			DalamudAPI.PluginLog.Verbose( $"In GenerateItemDetail Detour.  Blocking update: {mBlockItemTooltip}" );
+		}
+		catch
+		{
+			//	If Logging threw, we can't really do anything about it besides make sure that the hook completes and disables.
+			mGenerateItemDetailHook.Disable();
+		}
+
 		if( pAddonItemDetail != null &&
-			pStringArrayData != null )
+			pStringArrayData != null &&
+			!mBlockItemTooltip )
 		{
 			try
 			{
-				UpdateCurrentItemInfo();
 				var itemDescription = StringArrayDataHelpers.GetString( pStringArrayData, 13 );
 				bool descriptionModified = false;
 
@@ -99,17 +108,38 @@ internal unsafe static class ItemDetailHandler
 			}
 			catch( Exception e )
 			{
-				DalamudAPI.PluginLog.Error( $"Unknown error when generating item tooltip.  Disabling hook.  Error:\r\n{e}" );
 				mGenerateItemDetailHook.Disable();
+
+				try
+				{
+					DalamudAPI.PluginLog.Error( $"Unknown error when generating item tooltip.  Disabling hook.  Error:\r\n{e}" );
+				}
+				catch
+				{
+					//	If Logging threw, we can't really do anything about it besides make sure that the hook completes.
+				}
 			}
 		}
+
+		if( mBlockItemTooltip ) mBlockItemTooltip = false;
 
 		return mGenerateItemDetailHook.Original( pAddonItemDetail, pNumberArrayData, pStringArrayData );
 	}
 
-	internal static void UpdateCurrentItemInfo()
+	private static void OnHoveredItemChanged( object sender, ulong e )
 	{
-		mCurrentItemID = (Int32)DalamudAPI.GameGui.HoveredItem;
+		UpdateCurrentItemInfo( (Int32)e );
+
+		if( mPreviousItemID == 0 && mCurrentItemID != 0 ) mBlockItemTooltip = true;
+		else if( mPreviousItemID != 0 && mCurrentItemID == 0 ) mBlockItemTooltip = true;
+		else mBlockItemTooltip = false;
+
+		mPreviousItemID = mCurrentItemID;
+	}
+
+	internal static void UpdateCurrentItemInfo( Int32 itemID )
+	{
+		mCurrentItemID = itemID;
 
 		if( mCurrentItemID <= 0 )
 		{
@@ -118,8 +148,9 @@ internal unsafe static class ItemDetailHandler
 		else if( mCurrentItemID != CurrentItemInfo?.ItemID )
 		{
 			CurrentItemInfo = ItemCategorizer.GetItemInfo( mCurrentItemID );
-			DalamudAPI.PluginLog.Verbose( $"ItemDetail addon updated with item {mCurrentItemID}." );
 		}
+
+		DalamudAPI.PluginLog.Verbose( $"Hovered item updated to {mCurrentItemID}." );
 	}
 
 	private unsafe static void UpdateItemFlagsTextNode( bool show = true )
@@ -264,12 +295,17 @@ internal unsafe static class ItemDetailHandler
 	}
 
 	private static Int32 mCurrentItemID = 0;
+	private static Int32 mPreviousItemID = 0;
+
 	internal static ItemInfo CurrentItemInfo { get; private set; } = null;
 
 	private static Configuration mConfiguration = null;
 
 	private static byte* mpItemFlagsString = null;
-	private const int mItemFlagsStringMaxLength = 255;	//	Doesn't matter that much; just something that will stay out of the way, but is not insane.
+	private const int mItemFlagsStringMaxLength = 255;  //	Doesn't matter that much; just something that will stay out of the way, but is not insane.
+
+	//	Lifted this logic from Allagan Tools in order to help prevent double-appending strings to the item description when initially hovering an item from nothing.
+	private static bool mBlockItemTooltip;
 
 	private unsafe delegate nint GenerateItemDetailDelegate( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData );
 	private static Hook<GenerateItemDetailDelegate> mGenerateItemDetailHook = null;

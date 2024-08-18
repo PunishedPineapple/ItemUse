@@ -81,9 +81,20 @@ public sealed class Plugin : IDalamudPlugin
 
 	private void ProcessTextCommand( string command, string args )
 	{
-		if( args.ToLower() == SubcommandName_Debug.ToLower() )
+		if( args.ToLower().Contains( SubcommandName_Debug.ToLower() ) )
 		{
-			mUI.Window_Debug_ItemInfo.Toggle();
+			var subArgs = args.Split( ' ' );
+
+			if( subArgs.Length > 1 )
+			{
+				if( subArgs[1] == "item" ) mUI.Window_Debug_ItemInfo.Toggle();
+				else if( subArgs[1] == "loaded" ) mUI.Window_Debug_LoadedItems.Toggle();
+				else mUI.Window_Debug_General.Toggle();
+			}
+			else
+			{
+				mUI.Window_Debug_General.Toggle();
+			}
 		}
 		else
 		{

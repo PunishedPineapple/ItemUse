@@ -3,6 +3,7 @@ using System.Numerics;
 
 using CheapLoc;
 
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
@@ -33,11 +34,6 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 
 	public override void Draw()
 	{
-		if( ImGui.Button( "Export Localizable Strings" ) )
-		{
-			mPlugin.ExportLocalizableStrings();
-		}
-
 		var itemInfo = ItemDetailHandler.CurrentItemInfo;
 
 		if( itemInfo != null )
@@ -45,11 +41,13 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
 			var classJobsSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
 
-			//***** TODO: Handle HQ items.
+			var itemNQ = itemInfo.ItemID;
+			if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
 
-			var itemName = itemSheet?.GetRow( (UInt32)itemInfo.ItemID )?.Name ?? "Unknown";
+			var itemName = itemSheet?.GetRow( (UInt32)itemNQ )?.Name ?? "Unknown";
 
 			ImGui.Text( $"Item ID: {itemInfo.ItemID}" );
+			ImGui.Text( $"Item ID (NQ): {itemNQ}" );
 			ImGui.Text( $"Item Name: {itemName}" );
 			ImGui.Text( $"GC: {itemInfo.IsGCItem}" );
 			ImGui.Text( $"Leve: {itemInfo.IsLeveItem}" );
@@ -57,7 +55,9 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			ImGui.Text( $"Crafting: {itemInfo.IsCraftingMaterial}" );
 			ImGui.Text( $"Aquarium: {itemInfo.IsAquariumFish}" );
 
-			var jobs = ItemCategorizer.GetJobsForItem( itemInfo.ItemID );
+			ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
+
+			var jobs = ItemCategorizer.GetJobsForItem( itemNQ );
 			string str = "";
 			foreach( var job in jobs )
 			{
@@ -65,15 +65,19 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			}
 			ImGui.Text( $"Jobs: {str}" );
 
-			if( CofferManifests.ItemIsKnownCoffer( itemInfo.ItemID ) )
+			ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
+
+			if( CofferManifests.ItemIsKnownCoffer( itemNQ ) )
 			{
 				string cofferItemsStr = "";
-				foreach( var item in CofferManifests.GetCofferItems( itemInfo.ItemID ) )
+				foreach( var item in CofferManifests.GetCofferItems( itemNQ ) )
 				{
 					cofferItemsStr += itemSheet.GetRow( (uint)item ).Singular.ToString() + "\r\n";
 				}
 				ImGui.Text( $"Coffer Items:\r\n{cofferItemsStr}" );
 			}
+
+			ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
 			if( itemInfo.CofferGCJobs != null )
 			{
@@ -84,6 +88,8 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 				}
 				ImGui.Text( $"GC Jobs:\r\n{cofferGCJobsStr}" );
 			}
+
+			ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
 			if( itemInfo.CofferLeveJobs != null )
 			{
