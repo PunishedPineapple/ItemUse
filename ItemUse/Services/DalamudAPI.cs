@@ -1,4 +1,5 @@
-﻿using Dalamud.IoC;
+﻿using Dalamud.Game;
+using Dalamud.IoC;
 using Dalamud.Plugin.Services;
 
 namespace ItemUse;
@@ -12,4 +13,6 @@ internal class DalamudAPI
 	[PluginService] internal static IPluginLog PluginLog { get; private set; } = null!;
 	[PluginService] internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
 	[PluginService] internal static IGameGui GameGui { get; private set; } = null!;
+	[PluginService] internal static ISigScanner SigScanner { get; private set; } = null!;
+	[PluginService] internal static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
 }

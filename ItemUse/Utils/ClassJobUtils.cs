@@ -367,11 +367,11 @@ internal static class ClassJobUtils
 	private static HashSet<int> mCasters = null;
 
 	//	This is some made up garbage for convenience.  Don't leak these outside of this class.
-	private const int RoleIDTank = -1;
-	private const int RoleIDHealer = -2;
+	private const int RoleIDTank = -5;
+	private const int RoleIDHealer = -4;
 
 	//	Sadly no separate text icons for melee/ranged/caster DPS as far as I can tell, so not much point in these currently.
 	//private const int RoleIDMelee = -3;
-	//private const int RoleIDPhysRanged = -4;
-	//private const int RoleIDCaster = -5;
+	//private const int RoleIDPhysRanged = -2;
+	//private const int RoleIDCaster = -1;
 }

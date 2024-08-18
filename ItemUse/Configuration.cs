@@ -32,19 +32,16 @@ public class Configuration : IPluginConfiguration
 	public bool mShowCombinedUsefulFlag = false;
 	public bool mShowGCItemsFlag = true;
 	public bool mShowLeveItemsFlag = true;
-	public bool mShowCraftingMaterialsFlag = true;
+	public bool mShowCraftingMaterialsFlag = false;
 	public bool mShowAquariumFishFlag = true;
 	public bool mShowEhcatlItemsFlag = false;
-
-	public byte mGrandCompany = 1;
 
 	public bool mShowGCCofferJobs = true;
 	public bool mShowLeveCofferJobs = true;
 	public bool mCombineCofferJobs = false;
 
-	//***** TODO
-	//public bool mHighlightCraftingMaterialText = false;
-	//public bool mHighlightAquariumFishText = false;
+	public bool mHighlightCraftingMaterialText = true;
+	public bool mHighlightAquariumFishText = false;
 
 	#endregion
 }

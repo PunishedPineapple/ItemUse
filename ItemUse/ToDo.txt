@@ -1,21 +1,17 @@
 ﻿Bugs:
+	- The coffer jobs string is getting appended twice when hovering, but only if another item was not hovered first.
+
 
 To Do:
-	- Icon for leves
-	- Automatically determine GC.
-	- Can we easily highlight the "Crafting Material" and aquarium text in the tooltip?
-		-This is pulled from the Addon sheet (entry 996 for crafting materials).
-		-Can we hook where it's grabbed and add in color payloads there rather than editing the ATKArrayData?
+	- Better Icon for leves
 	- Allow hightlighting item name text in a specified color for a given category?
-	- Get coffer information into a better place visually.
-	- Handle PLD arms items.
-		- Do this as part of coffer manifests, or separately to just have the regular flags and make it cleaner?
-			-Or have a separate flag?
-		- These are in the game files with the "AdditionalData" column of the item sheet possibly providing an index into the ArchiveItem sheet.
-			-May be more to it than that, but this is where to pick back up on it later.
-		- Does it really make sense to do, since you can only use them on one job, and you'll basically always just use them?
 	- Flag items above a certain vendor sale gil threshold?
 	- Add debug windows for all of the item type lists and manifests.
 	- Figure out some way to add example icons to the settings menu for each type of flag.
+	- Add Ehcatl icon to plugin icon.
+		- Or maybe gil icon if we do add the gil flag.
+	- Is there a better addon lifecycle point to hook than update?  Update has been getting called more often than expected.
+	- Move text string allocations into the UI memory space.  It just seems like it would be neater to do it that way.
+
 
 Notes:

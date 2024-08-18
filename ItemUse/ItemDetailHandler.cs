@@ -6,6 +6,7 @@ using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Hooking;
 
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -21,30 +22,89 @@ internal unsafe static class ItemDetailHandler
 		if( mpItemFlagsString == null ) throw new Exception( "Unable to allocate text node string memory." );
 		else Marshal.WriteByte( (nint)mpItemFlagsString, 0 );
 
-		mpCofferJobsString = (byte*)Marshal.AllocHGlobal( mCofferJobsStringMaxLength + 1 );
-		if( mpCofferJobsString == null ) throw new Exception( "Unable to allocate text node string memory." );
-		else Marshal.WriteByte( (nint)mpCofferJobsString, 0 );
+		IntPtr fpGenerateItemDetail = DalamudAPI.SigScanner.ScanText( "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 20" );
+		if( fpGenerateItemDetail != IntPtr.Zero )
+		{
+			DalamudAPI.PluginLog.Information( $"GenerateItemDetail function signature found at 0x{fpGenerateItemDetail:X}." );
+			mGenerateItemDetailHook = DalamudAPI.GameInteropProvider.HookFromAddress<GenerateItemDetailDelegate>( fpGenerateItemDetail, GenerateItemDetailDetour );
+			mGenerateItemDetailHook?.Enable();
+		}
+		else
+		{
+			throw new Exception( "Unable to find the specified function signature for GenerateItemDetail." );
+		}
 
 		DalamudAPI.AddonLifecycle.RegisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
 	}
 
 	internal static void Uninit()
 	{
+		mGenerateItemDetailHook?.Disable();
+		
 		DalamudAPI.AddonLifecycle.UnregisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
+
 		mConfiguration = null;
+
 		AtkNodeHelpers.RemoveTextNode( (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ), mItemFlagsTextNodeID );
-		AtkNodeHelpers.RemoveTextNode( (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ), mCofferJobsTextNodeID );
+
 		if( mpItemFlagsString != null ) Marshal.FreeHGlobal( (nint)mpItemFlagsString );
-		if( mpCofferJobsString != null ) Marshal.FreeHGlobal( (nint)mpCofferJobsString );
+
+		mGenerateItemDetailHook?.Dispose();
 	}
 
 	private static void ItemDetailUpdateCallback( AddonEvent type, AddonArgs args )
 	{
-		UpdateCurrentItemInfo();
+		//UpdateCurrentItemInfo();
 		SetItemFlagsString( CurrentItemInfo );
-		SetCofferJobsString( CurrentItemInfo );
 		UpdateItemFlagsTextNode();
-		UpdateCofferJobsTextNode();
+	}
+
+	internal static unsafe nint GenerateItemDetailDetour( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData )
+	{
+		if( pAddonItemDetail != null &&
+			pStringArrayData != null )
+		{
+			try
+			{
+				UpdateCurrentItemInfo();
+				var itemDescription = StringArrayDataHelpers.GetString( pStringArrayData, 13 );
+				bool descriptionModified = false;
+
+				if( mConfiguration.mHighlightCraftingMaterialText && CurrentItemInfo?.IsCraftingMaterial == true )
+				{
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.CraftingMaterialTag );
+					descriptionModified = true;
+				}
+
+				if( mConfiguration.mHighlightAquariumFishText && CurrentItemInfo?.IsAquariumFish == true )
+				{
+					//	This is pretty lame, but I cannot think of a better way to do it that isn't even messier when considering all client languages.
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade1AquariumTag );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade2AquariumTag );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade3AquariumTag );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade4AquariumTag );
+					descriptionModified = true;
+				}
+
+				if( mConfiguration.mShowGCCofferJobs && CurrentItemInfo?.CofferGCJobs != null ||
+					mConfiguration.mShowLeveCofferJobs && CurrentItemInfo?.CofferLeveJobs != null )
+				{
+					itemDescription.Payloads.Add( new NewLinePayload() );
+					itemDescription.Payloads.Add( new NewLinePayload() );
+					itemDescription.Append( GetCofferJobsString( CurrentItemInfo ) );
+					descriptionModified = true;
+				}
+
+				if( descriptionModified ) StringArrayDataHelpers.SetString( pStringArrayData, 13, itemDescription );
+			}
+			catch( Exception e )
+			{
+				DalamudAPI.PluginLog.Error( $"Unknown error when generating item tooltip.  Disabling hook.  Error:\r\n{e}" );
+				mGenerateItemDetailHook.Disable();
+			}
+		}
+
+		return mGenerateItemDetailHook.Original( pAddonItemDetail, pNumberArrayData, pStringArrayData );
 	}
 
 	internal static void UpdateCurrentItemInfo()
@@ -132,80 +192,16 @@ internal unsafe static class ItemDetailHandler
 		}
 	}
 
-	//***** TODO: Ultimately it would be better to insert our coffer information string into the item description rather than maintaining a separate node.
-	private unsafe static void UpdateCofferJobsTextNode( bool show = true )
-	{
-		AtkUnitBase* pAddon = (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" );
-		AtkTextNode* pNode = null;
-		AtkTextNode* pItemQuantityTextNode = null;
-
-		if( pAddon != null )
-		{
-			pNode = AtkNodeHelpers.GetTextNodeByID( pAddon, mCofferJobsTextNodeID );
-			var pItemQuantityTextNodeAsRes = pAddon->GetNodeById( mItemQuantityTextNodeID );
-			if( pItemQuantityTextNodeAsRes != null ) pItemQuantityTextNode = pItemQuantityTextNodeAsRes->GetAsAtkTextNode();
-
-			//	If we have our node, set the colors, size, and text from settings.
-			if( pNode != null )
-			{
-				bool haveRequiredNodes = pItemQuantityTextNode != null;
-				bool visible = show && haveRequiredNodes;
-
-				pNode->ToggleVisibility( visible );
-
-				if( visible )
-				{
-					pNode->AtkResNode.SetPositionShort( 0, (short)-pNode->GetHeight() );
-
-					pNode->AtkResNode.Color.A = 255;
-
-					pNode->TextColor.A = pItemQuantityTextNode->TextColor.A;
-					pNode->TextColor.R = pItemQuantityTextNode->TextColor.R;
-					pNode->TextColor.G = pItemQuantityTextNode->TextColor.G;
-					pNode->TextColor.B = pItemQuantityTextNode->TextColor.B;
-
-					pNode->EdgeColor.A = pItemQuantityTextNode->EdgeColor.A;
-					pNode->EdgeColor.R = pItemQuantityTextNode->EdgeColor.R;
-					pNode->EdgeColor.G = pItemQuantityTextNode->EdgeColor.G;
-					pNode->EdgeColor.B = pItemQuantityTextNode->EdgeColor.B;
-
-					pNode->FontSize = 22;
-					pNode->AlignmentType = AlignmentType.BottomLeft;
-					pNode->FontType = FontType.Axis;
-					pNode->TextFlags = (byte)( TextFlags.Bold | TextFlags.MultiLine );
-					pNode->LineSpacing = pNode->FontSize;
-					pNode->CharSpacing = 1;
-
-					pNode->SetText( mpCofferJobsString );
-				}
-			}
-
-			//	Set up the node if it hasn't been.
-			else if( pAddon->RootNode != null )
-			{
-				pNode = AtkNodeHelpers.CreateNewTextNode( pAddon, mCofferJobsTextNodeID );
-			}
-		}
-	}
-
 	//***** TODO: Probably eventually get rid of this and make them real icons.
 	private static void SetItemFlagsString( ItemInfo itemInfo )
 	{
 		SeStringBuilder str = new();
 
-		//***** TODO: Can't find the player's GC in Dalamud anywhere (and not cleanly in ClientStructs).  Figure that out instead of using a manual config option.
-		var GCIcon = mConfiguration.mGrandCompany switch
-		{
-			2 => BitmapFontIcon.BlackShroud,
-			3 => BitmapFontIcon.Thanalan,
-			_ => BitmapFontIcon.LaNoscea
-		};
-
-		if( mConfiguration.mShowGCItemsFlag && ( itemInfo?.IsGCItem ?? false ) ) str.Add( new IconPayload( GCIcon ) );
-		if( mConfiguration.mShowLeveItemsFlag && ( itemInfo?.IsLeveItem ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Dice ) );
-		if( mConfiguration.mShowEhcatlItemsFlag && ( itemInfo?.IsEhcatlItem ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.FlyZone ) );
-		if( mConfiguration.mShowCraftingMaterialsFlag && ( itemInfo?.IsCraftingMaterial ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Crafter ) );
-		if( mConfiguration.mShowAquariumFishFlag && ( itemInfo?.IsAquariumFish ?? false ) ) str.Add( new IconPayload( BitmapFontIcon.Fisher ) );
+		if( mConfiguration.mShowGCItemsFlag && ( itemInfo?.IsGCItem ?? false ) ) str.AddIcon( GrandCompanyUtils.GetCurrentGCFontIcon() );
+		if( mConfiguration.mShowLeveItemsFlag && ( itemInfo?.IsLeveItem ?? false ) ) str.AddIcon( BitmapFontIcon.Dice );
+		if( mConfiguration.mShowEhcatlItemsFlag && ( itemInfo?.IsEhcatlItem ?? false ) ) str.AddIcon( BitmapFontIcon.FlyZone );
+		if( mConfiguration.mShowCraftingMaterialsFlag && ( itemInfo?.IsCraftingMaterial ?? false ) ) str.AddIcon( BitmapFontIcon.Crafter );
+		if( mConfiguration.mShowAquariumFishFlag && ( itemInfo?.IsAquariumFish ?? false ) ) str.AddIcon( BitmapFontIcon.Fisher );
 
 		//	Combine all of the flags into one thing if desired.
 		if( str.BuiltString.Payloads.Count > 0 && mConfiguration.mShowCombinedUsefulFlag )
@@ -225,7 +221,7 @@ internal unsafe static class ItemDetailHandler
 		}
 	}
 
-	private static void SetCofferJobsString( ItemInfo itemInfo )
+	private static SeString GetCofferJobsString( ItemInfo itemInfo )
 	{
 		SeStringBuilder str = new();
 
@@ -239,45 +235,32 @@ internal unsafe static class ItemDetailHandler
 				if( combinedJobs?.Count() > 0 )
 				{
 					str.AddIcon( BitmapFontIcon.GoldStar );
-					str.AddText( " - " );
+					str.AddText( ": " );
 					ClassJobUtils.GetIconStringForJobs( ref str, combinedJobs, true, true );
+					str.Add( new NewLinePayload() );
 				}
 			}
 			else
 			{
 				if( itemInfo.CofferGCJobs?.Count > 0 && mConfiguration.mShowGCCofferJobs )
 				{
-					//***** TODO: Can't find the player's GC in Dalamud anywhere (and not cleanly in ClientStructs).  Figure that out instead of using a manual config option.
-					var GCIcon = mConfiguration.mGrandCompany switch
-					{
-						2 => BitmapFontIcon.BlackShroud,
-						3 => BitmapFontIcon.Thanalan,
-						_ => BitmapFontIcon.LaNoscea
-					};
-
-					str.AddIcon( GCIcon );
-					str.AddText( " - " );
+					str.AddIcon( GrandCompanyUtils.GetCurrentGCFontIcon() );
+					str.AddText( ": " );
 					ClassJobUtils.GetIconStringForJobs( ref str, itemInfo.CofferGCJobs, true, true );
+					str.Add( new NewLinePayload() );
 				}
 				if( itemInfo.CofferLeveJobs?.Count > 0 && mConfiguration.mShowLeveCofferJobs )
 				{
 					str.Add( new NewLinePayload() );
 					str.AddIcon( BitmapFontIcon.Dice );
-					str.AddText( " - " );
+					str.AddText( ": " );
 					ClassJobUtils.GetIconStringForJobs( ref str, itemInfo.CofferLeveJobs, true, true );
+					str.Add( new NewLinePayload() );
 				}
 			}
 		}
 
-		byte[] encodedStr = str.BuiltString.EncodeWithNullTerminator();
-		if( encodedStr.Length <= mCofferJobsStringMaxLength )
-		{
-			Marshal.Copy( encodedStr, 0, (nint)mpCofferJobsString, encodedStr.Length );
-		}
-		else
-		{
-			Marshal.WriteByte( (nint)mpCofferJobsString, 0 );
-		}
+		return str.BuiltString;
 	}
 
 	private static Int32 mCurrentItemID = 0;
@@ -288,12 +271,11 @@ internal unsafe static class ItemDetailHandler
 	private static byte* mpItemFlagsString = null;
 	private const int mItemFlagsStringMaxLength = 255;	//	Doesn't matter that much; just something that will stay out of the way, but is not insane.
 
-	private static byte* mpCofferJobsString = null;
-	private const int mCofferJobsStringMaxLength = 1023;	//	Doesn't matter that much; just something that will stay out of the way, but is not insane.
+	private unsafe delegate nint GenerateItemDetailDelegate( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData );
+	private static Hook<GenerateItemDetailDelegate> mGenerateItemDetailHook = null;
 
 	//	Note: Node IDs only need to be unique within a given addon.
 	internal const uint mItemFlagsTextNodeID = 0x6C38B300;	//YOLO hoping for no collisions.
-	internal const uint mCofferJobsTextNodeID = 0x6C38B400;	//YOLO hoping for no collisions.
 	internal const uint mTitleBarResNodeID = 17;
 	internal const uint mIconsContainerResNodeID = 24;
 	internal const uint mItemFlagsRightmostIconResNodeID = 29;

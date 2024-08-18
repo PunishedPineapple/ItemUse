@@ -1,0 +1,8 @@
+- There is not really any point in processing them in this plugin, but PLD arms items are in the game files with the "AdditionalData" column of the item sheet possibly providing an index into the ArchiveItem sheet.
+	-May be more to it than that, but this is where to pick back up on it later if ever desired.
+
+- Fuction that appends the "Crafting Material", etc. text to item descriptions appears to be 140e7a9d0 in game version 2024.07.10.0001.0000.
+	- Sig is "??  89 ??  ??  ??  ??  89 ??  ??  ??  ??  89 ??  ??  ??  ??  89 ??  ??  ??  41 ??  48 83 ??  ??  48 8B ??  4C 8B ??  48 8B ??  48".
+	- The tag text is pulled from the Addon sheet (entry 996 for crafting materials).
+	- The best approach to coloring the text appears to be to hook GetAddonText, although that is a loooooot of calls into our hook from all over the game.
+		- Unfortunately, aquarium fish appear to have the tag text baked right into the item description in the item sheet, so we cannot even use this function for all purposes.

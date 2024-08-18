@@ -2,6 +2,7 @@
 
 using CheapLoc;
 
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
@@ -37,35 +38,22 @@ public class Window_Settings : Window, IDisposable
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Combine Flags", "Combine all Flags" ) + "###CombineFlagsCheckbox", ref mConfiguration.mShowCombinedUsefulFlag );
 		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Combine Flags", "Instead of displaying separate flags for each item type, just shows a single star flag to indicate that an item is \"useful\"." ) );
 
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
+		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
-		ImGui.Text( Loc.Localize( "Settings: Header - Coffer Information:", "Coffer Information" ) );
+		ImGui.Text( Loc.Localize( "Settings: Header - Coffer Information", "Coffer Information:" ) );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer GC Items", "Show Jobs with GC Items" ) + "###ShowCofferGCJobsCheckbox", ref mConfiguration.mShowGCCofferJobs );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer Leve Items", "Show Jobs with Leve Items" ) + "###ShowCofferLeveJobsCheckbox", ref mConfiguration.mShowLeveCofferJobs );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Combine Coffer Jobs", "Combine Coffer Jobs" ) + "###CombineCofferJobsCheckbox", ref mConfiguration.mCombineCofferJobs );
 		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Combine Coffer Jobs", "Instead of displaying separate lists for GC deliveries and leves, just shows a single list with a star icon to indicate which jobs produce \"useful\" items when opening the coffer." ) );
 
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
+		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
-		ImGui.Text( Loc.Localize( "Settings: Text - Grand Company", "Grand Company:" ) );
-		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Grand Company", "Which grand company symbol to use when showing items that are for GC deliveries." ) );
-		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Maelstrom", "The Maelstrom" ) + "###GCButtonMaelstrom", mConfiguration.mGrandCompany == 1 ) ) mConfiguration.mGrandCompany = 1;
-		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Adders", "The Twin Adders" ) + "###GCButtonAdders", mConfiguration.mGrandCompany == 2 ) ) mConfiguration.mGrandCompany = 2;
-		if( ImGui.RadioButton( Loc.Localize( "Settings: Button - GC Flames", "The Immortal Flames" ) + "###GCButtonFlames", mConfiguration.mGrandCompany == 3 ) ) mConfiguration.mGrandCompany = 3;
+		ImGui.Text( Loc.Localize( "Settings: Header - Highlighting", "Highlighting:" ) );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Highlight Crafting Material", "Highlight \"Crafting Material\" Tag" ) + "###HighlightCraftingMaterialTextCheckbox", ref mConfiguration.mHighlightCraftingMaterialText );
+		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Highlight Aquarium Fish", "Highlight Aquarium Fish Tag" ) + "###HighlightAquariumFishTextCheckbox", ref mConfiguration.mHighlightAquariumFishText );
+		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Highlight Aquarium Fish", "Please note that this is slightly less reliable than the aquarium fish flag above.  Due to how SE applies the aquarium tags in the descriptions for fish, it is possible for a typo in the item description to break highlighting for that item." ) );
 
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
-		ImGui.Spacing();
+		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
 		if( ImGui.Button( Loc.Localize( "Button: Save", "Save" ) + "###Save Button" ) )
 		{

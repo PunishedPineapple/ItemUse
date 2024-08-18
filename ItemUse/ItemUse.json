@@ -9,5 +9,6 @@
     "https://github.com/PunishedPineapple/ItemUse/raw/main/docs/Images/image1.png",
     "https://github.com/PunishedPineapple/ItemUse/raw/main/docs/Images/image2.png"
   ],
+  "LoadPriority": -1, //  We want to load late to help avoid visual ordering issues with other plugins that hook ItemDetail generation (like Allagan Tools).  This is not a great solution (ordering will be messed up when plugins update), but not sure what else to do until/unless hook priorities get implemented or Dalamud ever mediates this like DTR.
   "Tags": [ "Item", "Inventory", "Leve", "Levequest", "GC", "Grand Company", "Aquarium", "Crafting", "Coffer" ]
 }
