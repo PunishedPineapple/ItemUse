@@ -24,6 +24,7 @@ internal unsafe static class ItemDetailHandler
 
 		DalamudAPI.GameGui.HoveredItemChanged += OnHoveredItemChanged;
 
+		//	Sig and delegate stolen from Allagan Tools.
 		IntPtr fpGenerateItemDetail = DalamudAPI.SigScanner.ScanText( "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 20" );
 		if( fpGenerateItemDetail != IntPtr.Zero )
 		{
