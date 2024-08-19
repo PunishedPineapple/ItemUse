@@ -32,9 +32,11 @@ internal static class ItemCategorizer
 		}
 		else
 		{
-			//	Handle HQ items.
+			//	Handle special item IDs.
 			var itemNQ = item;
-			if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
+			if( itemNQ > 2_000_000 ) { }	//	These are EventItems, about which we don't really care.
+			else if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
+			else if( itemNQ > 500_000 ) itemNQ -= 500_000;
 
 			//	Handle coffer stuff.
 			bool itemIsCoffer = CofferManifests.ItemIsKnownCoffer( item );
@@ -303,6 +305,8 @@ internal static class ItemCategorizer
 		retVal.Sort();
 		return retVal;
 	}
+
+	internal static int DEBUG_ItemCacheCount => mItemInfoCache?.Count ?? 0;
 
 	private static readonly HashSet<Int32> mGCItems = new();
 	private static readonly HashSet<Int32> mLeveItems = new();

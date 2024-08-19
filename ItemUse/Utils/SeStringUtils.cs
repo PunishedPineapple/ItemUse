@@ -13,6 +13,9 @@ internal class SeStringUtils
 {
 	internal static void HighlightLastOccuranceOfText( ref SeString str, string tagStr )
 	{
+		//	Doing it this way is a bit on the slow side (up to a few hundred μs per call).  If we ever actually run into performance problems, we could try
+		//	just UTF-8 encoding the tag string and searching and operating on the raw bytes instead (with pre-encoded foreground/glow payloads, even).
+
 		int tagPayloadIndex = -1;
 		var splitTextEndPayload = new TextPayload( "" );
 

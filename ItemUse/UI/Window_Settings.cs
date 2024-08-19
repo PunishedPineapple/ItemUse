@@ -9,7 +9,7 @@ using ImGuiNET;
 
 namespace ItemUse;
 
-public class Window_Settings : Window, IDisposable
+internal sealed class Window_Settings : Window, IDisposable
 {
 	public Window_Settings( Plugin plugin, PluginUI pluginUI, Configuration configuration ) :
 		base( Loc.Localize( "Window Title - Settings", "\"Item Use\" Settings" ) + "###ItemInfoSettingsWindow" )
@@ -41,6 +41,7 @@ public class Window_Settings : Window, IDisposable
 		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
 		ImGui.Text( Loc.Localize( "Settings: Header - Coffer Information", "Coffer Information:" ) );
+		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Coffer Information", "Please note that the contents of gear coffers are not directly available to the client, and have been semi-manually compiled.  If you find a coffer that you believe has incorrect information, please report it on this plugin's Github repo." ) ); 
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer GC Items", "Show Jobs with GC Items" ) + "###ShowCofferGCJobsCheckbox", ref mConfiguration.mShowGCCofferJobs );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer Leve Items", "Show Jobs with Leve Items" ) + "###ShowCofferLeveJobsCheckbox", ref mConfiguration.mShowLeveCofferJobs );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Combine Coffer Jobs", "Combine Coffer Jobs" ) + "###CombineCofferJobsCheckbox", ref mConfiguration.mCombineCofferJobs );

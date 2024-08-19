@@ -12,7 +12,7 @@ using Lumina.Excel.GeneratedSheets;
 
 namespace ItemUse;
 
-public class Window_Debug_ItemInfo : Window, IDisposable
+internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 {
 	public Window_Debug_ItemInfo( Plugin plugin, PluginUI pluginUI, Configuration configuration ) :
 		base( Loc.Localize( "Window Title - Debug Item Info", "\"Item Use\" Debug Data - Item Info" ) + "###ItemInfoDebugWindow" )
@@ -41,8 +41,11 @@ public class Window_Debug_ItemInfo : Window, IDisposable
 			var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
 			var classJobsSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
 
+			//	Handle special item IDs.
 			var itemNQ = itemInfo.ItemID;
-			if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
+			if( itemNQ > 2_000_000 ) { }    //	These are EventItems, about which we don't really care.
+			else if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
+			else if( itemNQ > 500_000 ) itemNQ -= 500_000;
 
 			var itemName = itemSheet?.GetRow( (UInt32)itemNQ )?.Name ?? "Unknown";
 

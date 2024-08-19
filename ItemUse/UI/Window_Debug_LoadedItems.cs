@@ -12,7 +12,7 @@ using Lumina.Excel.GeneratedSheets;
 
 namespace ItemUse;
 
-public class Window_Debug_LoadedItems : Window, IDisposable
+internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 {
 	public Window_Debug_LoadedItems( Plugin plugin, PluginUI pluginUI, Configuration configuration ) :
 		base( Loc.Localize( "Window Title - Loaded Items", "\"Item Use\" Debug Data - Loaded Items" ) + "###LoadedItemsDebugWindow" )
@@ -133,7 +133,7 @@ public class Window_Debug_LoadedItems : Window, IDisposable
 	}
 
 	//	Not going through the work of getting a proper Enum and extensions working with ImGui just for a quick debug window.
-	private readonly string[] mItemTypeComboStrings = { "GC Items", "Leve Items", "Ehcatl Items", "Crafting Materials", "Aquarium Fish", "Coffer Manifests" };
+	private readonly string[] mItemTypeComboStrings = ["GC Items", "Leve Items", "Ehcatl Items", "Crafting Materials", "Aquarium Fish", "Coffer Manifests"];
 	private int mSelectedItemType = 0;
 
 	private bool mResolveCofferManifestItemNames = false;

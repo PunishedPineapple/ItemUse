@@ -1,5 +1,6 @@
 - There is not really any point in processing them in this plugin, but PLD arms items are in the game files with the "AdditionalData" column of the item sheet possibly providing an index into the ArchiveItem sheet.
-	-May be more to it than that, but this is where to pick back up on it later if ever desired.
+	- May be more to it than that, but this is where to pick back up on it later if ever desired.
+	- There are also a handful of coffer contents in this sheet as well, but they are not linked to their coffer's item data in any way that I can find (eee Luner Envoy's Accessories of Casting Coffer).
 
 - Fuction that appends the "Crafting Material", etc. text to item descriptions appears to be 140e7a9d0 in game version 2024.07.10.0001.0000.
 	- Sig is "??  89 ??  ??  ??  ??  89 ??  ??  ??  ??  89 ??  ??  ??  ??  89 ??  ??  ??  41 ??  48 83 ??  ??  48 8B ??  4C 8B ??  48 8B ??  48".

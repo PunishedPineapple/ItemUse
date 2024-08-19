@@ -1,17 +1,16 @@
 ﻿Bugs:
-	- The coffer jobs string is getting appended twice when hovering, but only if another item was not hovered first.
 
 
 To Do:
 	- Better Icon for leves
 	- Allow hightlighting item name text in a specified color for a given category?
 	- Flag items above a certain vendor sale gil threshold?
-	- Add debug windows for all of the item type lists and manifests.
 	- Figure out some way to add example icons to the settings menu for each type of flag.
 	- Add Ehcatl icon to plugin icon.
 		- Or maybe gil icon if we do add the gil flag.
 	- Is there a better addon lifecycle point to hook than update?  Update has been getting called more often than expected.
 	- Move text string allocations into the UI memory space.  It just seems like it would be neater to do it that way.
+	- Draw the coffer manifest data in a table to make it a bit less difficult to read.
 
 
 Notes:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace ItemUse;
 
@@ -24,17 +25,43 @@ internal static class CofferManifests
 			try
 			{
 				var manifestFile = File.OpenText( filePath );
-
-				//***** TODO: Make this look less like poop.
 				var line = manifestFile.ReadLine();
+				int lineCount = 0;
+				
 				while( line != null )
 				{
+					++lineCount;
+
+					bool lineValid = true;
 					var tokens = line.Split( ',' );
-					if( tokens.Length > 1 )
+
+					Int32 cofferID = 0;
+					if( tokens.Length > 0 )
 					{
-						List<int> tokens2 = new();
-						for( int i = 1; i < tokens.Length; ++i ) tokens2.Add( int.Parse( tokens[i] ));
-						mCofferManifests.TryAdd( int.Parse( tokens[0] ), tokens2.ToArray() );
+						lineValid &= Int32.TryParse( tokens[0], out cofferID );
+					}
+					else
+					{
+						lineValid = false;
+					}
+
+					List<Int32> itemIDs = new();
+					for( int i = 1; i < tokens.Length; ++i )
+					{
+						Int32 itemID;
+						lineValid &= Int32.TryParse( tokens[i], out itemID );
+						itemIDs.Add( itemID );
+					}
+
+					if( lineValid )
+					{
+						mCofferManifests.TryAdd( cofferID, [.. itemIDs] );
+					}
+					else
+					{
+						DalamudAPI.PluginLog.Error( $"Invalid coffer manifest at line {lineCount}, aborting manifest load." );
+						mCofferManifests.Clear();
+						break;
 					}
 
 					line = manifestFile.ReadLine();

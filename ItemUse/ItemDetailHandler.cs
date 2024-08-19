@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -55,12 +57,16 @@ internal unsafe static class ItemDetailHandler
 
 	private static void ItemDetailUpdateCallback( AddonEvent type, AddonArgs args )
 	{
+		mFlagUpdateStopwatch.Restart();
 		SetItemFlagsString( CurrentItemInfo );
 		UpdateItemFlagsTextNode();
+		mFlagUpdateStopwatch.Stop();
 	}
 
 	private static unsafe nint GenerateItemDetailDetour( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData )
 	{
+		mHookTimeStopwatch.Restart();
+
 		try
 		{
 			DalamudAPI.PluginLog.Verbose( $"In GenerateItemDetail Detour.  Blocking update: {mBlockItemTooltip}" );
@@ -80,6 +86,8 @@ internal unsafe static class ItemDetailHandler
 				var itemDescription = StringArrayDataHelpers.GetString( pStringArrayData, 13 );
 				bool descriptionModified = false;
 
+				mTextHighlightStopwatch.Restart();
+
 				if( mConfiguration.mHighlightCraftingMaterialText && CurrentItemInfo?.IsCraftingMaterial == true )
 				{
 					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.CraftingMaterialTag );
@@ -96,6 +104,10 @@ internal unsafe static class ItemDetailHandler
 					descriptionModified = true;
 				}
 
+				mTextHighlightStopwatch.Stop();
+
+				mCofferStringStopwatch.Restart();
+
 				if( mConfiguration.mShowGCCofferJobs && CurrentItemInfo?.CofferGCJobs != null ||
 					mConfiguration.mShowLeveCofferJobs && CurrentItemInfo?.CofferLeveJobs != null )
 				{
@@ -104,6 +116,8 @@ internal unsafe static class ItemDetailHandler
 					itemDescription.Append( GetCofferJobsString( CurrentItemInfo ) );
 					descriptionModified = true;
 				}
+
+				mCofferStringStopwatch.Stop();
 
 				if( descriptionModified ) StringArrayDataHelpers.SetString( pStringArrayData, 13, itemDescription );
 			}
@@ -124,6 +138,8 @@ internal unsafe static class ItemDetailHandler
 
 		if( mBlockItemTooltip ) mBlockItemTooltip = false;
 
+		mHookTimeStopwatch.Stop();
+
 		return mGenerateItemDetailHook.Original( pAddonItemDetail, pNumberArrayData, pStringArrayData );
 	}
 
@@ -140,6 +156,8 @@ internal unsafe static class ItemDetailHandler
 
 	internal static void UpdateCurrentItemInfo( Int32 itemID )
 	{
+		mItemInfoUpdateStopwatch.Restart();
+
 		mCurrentItemID = itemID;
 
 		if( mCurrentItemID <= 0 )
@@ -152,6 +170,8 @@ internal unsafe static class ItemDetailHandler
 		}
 
 		DalamudAPI.PluginLog.Verbose( $"Hovered item updated to {mCurrentItemID}." );
+
+		mItemInfoUpdateStopwatch.Stop();
 	}
 
 	private unsafe static void UpdateItemFlagsTextNode( bool show = true )
@@ -263,8 +283,8 @@ internal unsafe static class ItemDetailHandler
 			{
 				var GCJobs = mConfiguration.mShowGCCofferJobs ? itemInfo.CofferGCJobs : null;
 				var leveJobs = mConfiguration.mShowLeveCofferJobs ? itemInfo.CofferLeveJobs : null;
-				var combinedJobs = GCJobs?.Union( leveJobs ?? new() ) ?? leveJobs?.Union( GCJobs ?? new() );
-				if( combinedJobs?.Count() > 0 )
+				var combinedJobs = GCJobs?.Union( leveJobs ?? ImmutableHashSet<Int32>.Empty ) ?? leveJobs?.Union( GCJobs ?? ImmutableHashSet<Int32>.Empty );
+				if( combinedJobs?.Count > 0 )
 				{
 					str.AddIcon( BitmapFontIcon.GoldStar );
 					str.AddText( ": " );
@@ -311,11 +331,23 @@ internal unsafe static class ItemDetailHandler
 	private unsafe delegate nint GenerateItemDetailDelegate( AtkUnitBase* pAddonItemDetail, NumberArrayData* pNumberArrayData, StringArrayData* pStringArrayData );
 	private static Hook<GenerateItemDetailDelegate> mGenerateItemDetailHook = null;
 
+	private static readonly Stopwatch mFlagUpdateStopwatch = new();
+	private static readonly Stopwatch mHookTimeStopwatch = new();
+	private static readonly Stopwatch mCofferStringStopwatch = new();
+	private static readonly Stopwatch mTextHighlightStopwatch = new();
+	private static readonly Stopwatch mItemInfoUpdateStopwatch = new();
+
+	internal static long DEBUG_FlagUpdateTime_uSec => mFlagUpdateStopwatch.ElapsedMicroseconds();
+	internal static long DEBUG_HookTime_uSec => mHookTimeStopwatch.ElapsedMicroseconds();
+	internal static long DEBUG_CofferStringTime_uSec => mCofferStringStopwatch.ElapsedMicroseconds();
+	internal static long DEBUG_TextHighlightTime_uSec => mTextHighlightStopwatch.ElapsedMicroseconds();
+	internal static long DEBUG_ItemInfoUpdateTime_uSec => mItemInfoUpdateStopwatch.ElapsedMicroseconds();
+
 	//	Note: Node IDs only need to be unique within a given addon.
-	internal const uint mItemFlagsTextNodeID = 0x6C38B300;	//YOLO hoping for no collisions.
-	internal const uint mTitleBarResNodeID = 17;
-	internal const uint mIconsContainerResNodeID = 24;
-	internal const uint mItemFlagsRightmostIconResNodeID = 29;
-	internal const uint mItemFlagsLeftmostIconResNodeID = 25;
-	internal const uint mItemQuantityTextNodeID = 33;
+	private const uint mItemFlagsTextNodeID = 0x6C38B300;	//YOLO hoping for no collisions.
+	private const uint mTitleBarResNodeID = 17;
+	private const uint mIconsContainerResNodeID = 24;
+	private const uint mItemFlagsRightmostIconResNodeID = 29;
+	private const uint mItemFlagsLeftmostIconResNodeID = 25;
+	private const uint mItemQuantityTextNodeID = 33;
 }
