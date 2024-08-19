@@ -15,4 +15,5 @@ internal class DalamudAPI
 	[PluginService] internal static IGameGui GameGui { get; private set; } = null!;
 	[PluginService] internal static ISigScanner SigScanner { get; private set; } = null!;
 	[PluginService] internal static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
+	[PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
 }
