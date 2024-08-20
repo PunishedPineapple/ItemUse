@@ -73,4 +73,15 @@ internal static class LocalizationHelpers
 			ClientLanguage.French => "[Peut être élevé dans un aquarium de très grande taille ou supérieure]",
 			_ => "You should never see this!",
 		};
+
+	internal static string ExchangeableForGilTag =>
+		DalamudAPI.ClientState.ClientLanguage switch
+		{
+			ClientLanguage.Japanese => "[換金用アイテム]",
+			ClientLanguage.English => "Exchangeable for gil.",
+			ClientLanguage.German => "Kann gegen Gil eingetauscht werden.",
+			ClientLanguage.French => "[Monnaie d'échange contre des gils]",
+			_ => "You should never see this!",
+		};
+
 }
