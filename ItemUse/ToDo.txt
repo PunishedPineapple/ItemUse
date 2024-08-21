@@ -2,15 +2,16 @@
 
 
 To Do:
-	- Better Icon for leves
+	- Better Icon for leves.
+		- This may not be feasible with how complicated it would make things be by not having the information as an SeString for coffers.
 	- Allow hightlighting item name text in a specified color for a given category?
 	- Flag items above a certain vendor sale gil threshold?
-	- Figure out some way to add example icons to the settings menu for each type of flag.
 	- Add Ehcatl icon to plugin icon.
 		- Or maybe gil icon if we do add the gil flag.
 	- Is there a better addon lifecycle point to hook than update?  Update has been getting called more often than expected.
 	- Move text string allocations into the UI memory space.  It just seems like it would be neater to do it that way.
 	- Draw the coffer manifest data in a table to make it a bit less difficult to read.
+	- Dropdowns to let the user set the highlight colors.  Probably allow them to be set separately for each tag type.
 
 
 Notes:
