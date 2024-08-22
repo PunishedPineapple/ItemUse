@@ -36,11 +36,15 @@ public sealed class Plugin : IDalamudPlugin
 
 		//	Event Subscription
 		mPluginInterface.LanguageChanged += OnLanguageChanged;
+		DalamudAPI.ClientState.Login += UITextColorSelector.CacheUITheme;
+		DalamudAPI.ClientState.Logout += UITextColorSelector.CacheUITheme;
 	}
 
 	//	Cleanup
 	public void Dispose()
 	{
+		DalamudAPI.ClientState.Logout -= UITextColorSelector.CacheUITheme;
+		DalamudAPI.ClientState.Login -= UITextColorSelector.CacheUITheme;
 		mPluginInterface.LanguageChanged -= OnLanguageChanged;
 		mPluginInterface.UiBuilder.Draw -= DrawUI;
 		mPluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;

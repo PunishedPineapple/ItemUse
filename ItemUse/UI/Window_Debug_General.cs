@@ -40,6 +40,7 @@ internal sealed class Window_Debug_General : Window, IDisposable
 		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
 		ImGui.Text( $"Current Grand Company: {GrandCompanyUtils.GetCurrentGC()}" );
+		ImGui.Text( $"Configured UI Theme: {UITextColorSelector.GetConfiguredUITheme()}" );
 
 		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 

@@ -69,8 +69,7 @@ internal class UITextColorSelector : IDisposable
 	{
 		if( mUIColors?.Length > 0 )
 		{
-			var theme = GetCurrentUITheme();
-			var selectedItemDrawColor = GetDrawColorForColorID( colorID, theme );
+			var selectedItemDrawColor = GetDrawColorForColorID( colorID, mCurrentUITheme );
 
 			ImGui.PushStyleColor( ImGuiCol.Text, selectedItemDrawColor );
 
@@ -85,7 +84,7 @@ internal class UITextColorSelector : IDisposable
 
 						var colorTextString = String.Format( Loc.Localize( "Settings: Dropdown - UI Text Color", "UI Color {0}" ), color.RowId );
 
-						ImGui.PushStyleColor( ImGuiCol.Text, GetDrawColorForUIColor( color, theme ) );
+						ImGui.PushStyleColor( ImGuiCol.Text, GetDrawColorForUIColor( color, mCurrentUITheme ) );
 						if( ImGui.Selectable( colorTextString ) ) colorID = (ushort)color.RowId;
 						if( color.RowId == colorID ) ImGui.SetItemDefaultFocus();
 						ImGui.PopStyleColor();
@@ -115,9 +114,11 @@ internal class UITextColorSelector : IDisposable
 
 	protected uint GetDrawColorForUIColor( UIColor color, byte theme )
 	{
+		UInt32 retVal;
+
 		if( color != null )
 		{
-			return theme switch
+			retVal = theme switch
 			{
 				1 => BinaryPrimitives.ReverseEndianness( color.UIGlow ),
 				2 => BinaryPrimitives.ReverseEndianness( color.Unknown2 ),
@@ -127,31 +128,42 @@ internal class UITextColorSelector : IDisposable
 		}
 		else
 		{
-			return ImGui.GetColorU32( ImGuiCol.Text );
+			retVal = ImGui.GetColorU32( ImGuiCol.Text );
+		}
+
+		//	Low-limit the alpha so that the user can always see something.
+		return retVal | 0x40_00_00_00;
+	}
+
+	//	We want to cache this on login so that the colors are always correct for the currently-displayed theme.
+	public static void CacheUITheme()
+	{
+		if( DalamudAPI.ClientState.IsLoggedIn )
+		{
+			mCurrentUITheme = GetConfiguredUITheme();
+		}
+		else
+		{
+			//	The game always uses the default theme when not logged in to a character.
+			mCurrentUITheme = 0;
 		}
 	}
 
-	internal unsafe byte GetCurrentUITheme()
+	internal static byte GetConfiguredUITheme()
 	{
-		//	Getting this value is not working as expected.
-		/*if( UIModule.Instance() != null &&
-			UIModule.Instance()->GetConfigModule() != null &&
-			UIModule.Instance()->GetConfigModule()->Values.Length > (int)ConfigOption.ColorThemeType )
+		if( DalamudAPI.GameConfig.TryGet( Dalamud.Game.Config.SystemConfigOption.ColorThemeType, out uint theme ) )
 		{
-			byte[] themeOptionArray = null;
-			fixed( void* pThemeOption = &UIModule.Instance()->GetConfigModule()->Values[(int)ConfigOption.ColorThemeType] )
-			{
-				var themeOption = new ReadOnlySpan<byte>( pThemeOption, Marshal.SizeOf<ConfigValue>() );
-				themeOptionArray = themeOption.ToArray();
-			}
-
-			return themeOptionArray.Last();
-		}*/
-
-		return 0;
+			return (byte)theme;
+		}
+		else
+		{
+			return 0;
+		}
 	}
+
+	private static byte mCurrentUITheme = 0;
 
 	private readonly UIColor[] mUIColors = null;
 	private bool mShowColorSelectors = false;
-	private string mUIIdentifierPrefix;
+	private readonly string mUIIdentifierPrefix;
 }
