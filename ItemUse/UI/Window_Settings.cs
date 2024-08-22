@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 
 using CheapLoc;
@@ -7,6 +8,8 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
+
+using Lumina.Excel.GeneratedSheets;
 
 namespace ItemUse;
 
@@ -20,11 +23,17 @@ internal sealed class Window_Settings : Window, IDisposable
 		mPlugin = plugin;
 		mPluginUI = pluginUI;
 		mConfiguration = configuration;
+
+		var UIColors = DalamudAPI.DataManager.GetExcelSheet<UIColor>()?.ToArray();
+
+		mCraftingMaterialHighlightColorSelector = new( UIColors, "CraftingMaterialHighlightColors" );
+		mAquariumFishHighlightColorSelector = new( UIColors, "AquariumFishHighlightColors" );
 	}
 
 	public void Dispose()
 	{
-
+		mCraftingMaterialHighlightColorSelector.Dispose();
+		mAquariumFishHighlightColorSelector.Dispose();
 	}
 
 	public override void Draw()
@@ -77,7 +86,7 @@ internal sealed class Window_Settings : Window, IDisposable
 
 		ImGui.Text( Loc.Localize( "Settings: Header - Coffer Information", "Coffer Information:" ) );
 		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Coffer Information", "Please note that the contents of gear coffers are not directly available to the client, and have been semi-manually compiled.  If you find a coffer that you believe has incorrect information, please report it on this plugin's Github repo." ) ); 
-		
+
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Show Coffer GC Items", "Show Jobs with GC Items" ) + "###ShowCofferGCJobsCheckbox", ref mConfiguration.mShowGCCofferJobs );
 		ImGui.SameLine();
 		ImGui.Image( fontIconTex.ImGuiHandle, iconSize, GCIconStart_UV, GCUVEnd_UV );
@@ -96,8 +105,10 @@ internal sealed class Window_Settings : Window, IDisposable
 		ImGui.Text( Loc.Localize( "Settings: Header - Highlighting", "Highlighting:" ) );
 
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Highlight Crafting Material", "Highlight \"Crafting Material\" Tag" ) + "###HighlightCraftingMaterialTextCheckbox", ref mConfiguration.mHighlightCraftingMaterialText );
+		mCraftingMaterialHighlightColorSelector?.Draw( ref mConfiguration.mHighlightCraftingMaterialTextColor, ref mConfiguration.mHighlightCraftingMaterialGlowColor );
 		ImGui.Checkbox( Loc.Localize( "Settings: Checkbox - Highlight Aquarium Fish", "Highlight Aquarium Fish Tag" ) + "###HighlightAquariumFishTextCheckbox", ref mConfiguration.mHighlightAquariumFishText );
 		ImGuiUtils.HelpMarker( Loc.Localize( "Help: Settings - Highlight Aquarium Fish", "Please note that this is slightly less reliable than the aquarium fish flag above.  Due to how SE applies the aquarium tags in the descriptions for fish, it is possible for a typo in the item description to break highlighting for that item." ) );
+		mAquariumFishHighlightColorSelector?.Draw( ref mConfiguration.mHighlightAquariumFishTextColor, ref mConfiguration.mHighlightAquariumFishGlowColor );
 
 		ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
@@ -116,6 +127,9 @@ internal sealed class Window_Settings : Window, IDisposable
 	private readonly Plugin mPlugin;
 	private readonly PluginUI mPluginUI;
 	private readonly Configuration mConfiguration;
+
+	private readonly UITextColorSelector mCraftingMaterialHighlightColorSelector = null;
+	private readonly UITextColorSelector mAquariumFishHighlightColorSelector = null;
 
 	//	It would really be nice to use the gfd file to get these UVs, but Dalamud's implementation is
 	//	not exposed, so we're probably out of luck without reimplementing and maintaining it ourselves.

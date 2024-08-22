@@ -89,17 +89,17 @@ internal unsafe static class ItemDetailHandler
 
 				if( mConfiguration.mHighlightCraftingMaterialText && CurrentItemInfo?.IsCraftingMaterial == true )
 				{
-					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.CraftingMaterialTag );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.CraftingMaterialTag, mConfiguration?.mHighlightCraftingMaterialTextColor ?? 500, mConfiguration?.mHighlightCraftingMaterialGlowColor ?? 501 );
 					descriptionModified = true;
 				}
 
 				if( mConfiguration.mHighlightAquariumFishText && CurrentItemInfo?.IsAquariumFish == true )
 				{
 					//	This is pretty lame, but I cannot think of a better way to do it that isn't even messier when considering all client languages.
-					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade1AquariumTag );
-					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade2AquariumTag );
-					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade3AquariumTag );
-					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade4AquariumTag );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade1AquariumTag, mConfiguration?.mHighlightAquariumFishTextColor ?? 500, mConfiguration?.mHighlightAquariumFishGlowColor ?? 501 );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade2AquariumTag, mConfiguration?.mHighlightAquariumFishTextColor ?? 500, mConfiguration?.mHighlightAquariumFishGlowColor ?? 501 );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade3AquariumTag, mConfiguration?.mHighlightAquariumFishTextColor ?? 500, mConfiguration?.mHighlightAquariumFishGlowColor ?? 501 );
+					SeStringUtils.HighlightLastOccuranceOfText( ref itemDescription, LocalizationHelpers.Grade4AquariumTag, mConfiguration?.mHighlightAquariumFishTextColor ?? 500, mConfiguration?.mHighlightAquariumFishGlowColor ?? 501 );
 					descriptionModified = true;
 				}
 

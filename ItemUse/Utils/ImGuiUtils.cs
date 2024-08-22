@@ -8,6 +8,11 @@ internal static class ImGuiUtils
 	{
 		if( sameLine ) ImGui.SameLine();
 		ImGui.TextDisabled( marker );
+		TooltipLastItem( description );
+	}
+
+	internal static void TooltipLastItem( string description )
+	{
 		if( ImGui.IsItemHovered() )
 		{
 			ImGui.BeginTooltip();

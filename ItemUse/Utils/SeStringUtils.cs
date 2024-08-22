@@ -7,7 +7,7 @@ namespace ItemUse;
 
 internal class SeStringUtils
 {
-	internal static void HighlightLastOccuranceOfText( ref SeString str, string tagStr )
+	internal static void HighlightLastOccuranceOfText( ref SeString str, string tagStr, ushort color, ushort glowColor )
 	{
 		//	Doing it this way is a bit on the slow side (up to a few hundred μs per call).  If we ever actually run into performance problems, we could try
 		//	just UTF-8 encoding the tag string and searching and operating on the raw bytes instead (with pre-encoded foreground/glow payloads, even).
@@ -34,8 +34,8 @@ internal class SeStringUtils
 		if( tagPayloadIndex >= 0 )
 		{
 			var newPayloads = new List<Payload>( 6 );
-			newPayloads.Add( new UIForegroundPayload( 500 ) );
-			newPayloads.Add( new UIGlowPayload( 501 ) );
+			newPayloads.Add( new UIForegroundPayload( color ) );
+			newPayloads.Add( new UIGlowPayload( glowColor ) );
 			newPayloads.Add( new TextPayload( tagStr ) );
 			newPayloads.Add( new UIForegroundPayload( 0 ) );
 			newPayloads.Add( new UIGlowPayload( 0 ) );

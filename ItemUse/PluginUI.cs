@@ -30,10 +30,10 @@ public sealed class PluginUI : IDisposable
 	{
 		mWindowSystem.RemoveAllWindows();
 
-		Window_Settings.Dispose();
-		Window_Debug_General.Dispose();
-		Window_Debug_ItemInfo.Dispose();
-		Window_Debug_LoadedItems.Dispose();
+		Window_Settings?.Dispose();
+		Window_Debug_General?.Dispose();
+		Window_Debug_ItemInfo?.Dispose();
+		Window_Debug_LoadedItems?.Dispose();
 
 		Window_Settings = null;
 		Window_Debug_General = null;

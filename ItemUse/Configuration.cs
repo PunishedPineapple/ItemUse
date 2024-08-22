@@ -43,5 +43,11 @@ public class Configuration : IPluginConfiguration
 	public bool mHighlightCraftingMaterialText = true;
 	public bool mHighlightAquariumFishText = false;
 
+	public ushort mHighlightCraftingMaterialTextColor = 500;
+	public ushort mHighlightCraftingMaterialGlowColor = 501;
+
+	public ushort mHighlightAquariumFishTextColor = 500;
+	public ushort mHighlightAquariumFishGlowColor = 501;
+ 
 	#endregion
 }
