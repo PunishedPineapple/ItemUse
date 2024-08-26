@@ -13,6 +13,8 @@ To Do:
 	- Move text string allocations into the UI memory space the next time that things go into testing.  It just seems like it would be neater to do it that way.
 		- Verify that nothing that we allocate gets freed when the UI refreshes (i.e., using the aesthetician).
 	- Draw the debug coffer manifest data as a table to make it a bit easier to read.
+	- Consider adding a way to flag crafting materials that only get used for housing or only get used for master book/starred crafts.
+		- This is getting a bit away from the main purpose of this plugin.  Think about whether to do it here or not.
 
 
 Rejected:
