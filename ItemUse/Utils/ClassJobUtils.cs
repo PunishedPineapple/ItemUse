@@ -82,8 +82,8 @@ internal static class ClassJobUtils
 			38 => new IconPayload( BitmapFontIcon.Dancer ),
 			39 => new IconPayload( BitmapFontIcon.Reaper ),
 			40 => new IconPayload( BitmapFontIcon.Sage ),
-			41 => new IconPayload( (BitmapFontIcon)170 ),
-			42 => new IconPayload( (BitmapFontIcon)171 ),
+			41 => new IconPayload( BitmapFontIcon.Viper ),
+			42 => new IconPayload( BitmapFontIcon.Pictomancer ),
 
 			_ => new TextPayload( jobStr ),
 		};
