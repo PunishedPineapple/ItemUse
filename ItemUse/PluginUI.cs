@@ -5,9 +5,8 @@ using Dalamud.Plugin;
 
 namespace ItemUse;
 
-public sealed class PluginUI : IDisposable
+internal sealed class PluginUI : IDisposable
 {
-	//	Construction
 	public PluginUI( Plugin plugin, Configuration configuration, IDalamudPluginInterface pluginInterface )
 	{
 		mPlugin = plugin;
@@ -25,7 +24,6 @@ public sealed class PluginUI : IDisposable
 		mWindowSystem.AddWindow( Window_Debug_LoadedItems );
 	}
 
-	//	Destruction
 	public void Dispose()
 	{
 		mWindowSystem.RemoveAllWindows();
@@ -46,9 +44,9 @@ public sealed class PluginUI : IDisposable
 		mWindowSystem.Draw();
 	}
 
-	private Plugin mPlugin;
-	private IDalamudPluginInterface mPluginInterface;
-	private Configuration mConfiguration;
+	private readonly Plugin mPlugin;
+	private readonly IDalamudPluginInterface mPluginInterface;
+	private readonly Configuration mConfiguration;
 	private readonly WindowSystem mWindowSystem = new( Plugin.Name );
 
 	internal Window_Settings Window_Settings { get; private set; }

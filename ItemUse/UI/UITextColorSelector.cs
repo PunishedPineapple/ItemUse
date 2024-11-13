@@ -15,16 +15,15 @@ internal class UITextColorSelector : IDisposable
 	public UITextColorSelector( UIColor[] availableColors, string identifierPrefix )
 	{
 		mUIColors = availableColors ?? throw new Exception( "Provided UI color array must not be null." );
+
 		mUIIdentifierPrefix = identifierPrefix;
-		if( mUIIdentifierPrefix == null || mUIIdentifierPrefix.Length < 1 )
+		if( string.IsNullOrEmpty( mUIIdentifierPrefix ) )
 		{
 			throw new Exception( "A valid prefix for ImGui identifiers must be provided." );
 		}
-
-		mUIIdentifierPrefix += '.';
 	}
 
-	private UITextColorSelector() {}
+	protected UITextColorSelector() {}
 
 	public void Dispose()
 	{

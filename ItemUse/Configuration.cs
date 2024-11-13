@@ -5,6 +5,8 @@ using Dalamud.Plugin;
 
 namespace ItemUse;
 
+//	IMPORTANT: This class (and its serializable members) must be public in order to be properly serialized and deserialized.
+
 [Serializable]
 public class Configuration : IPluginConfiguration
 {

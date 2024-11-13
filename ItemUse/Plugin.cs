@@ -10,7 +10,6 @@ namespace ItemUse;
 
 public sealed class Plugin : IDalamudPlugin
 {
-	//	Initialization
 	public Plugin( IDalamudPluginInterface pluginInterface )
 	{
 		//	API Access
@@ -40,7 +39,6 @@ public sealed class Plugin : IDalamudPlugin
 		DalamudAPI.ClientState.Logout += UITextColorSelector.CacheUITheme;
 	}
 
-	//	Cleanup
 	public void Dispose()
 	{
 		DalamudAPI.ClientState.Logout -= UITextColorSelector.CacheUITheme;

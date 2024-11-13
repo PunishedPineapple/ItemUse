@@ -15,6 +15,9 @@ To Do:
 	- Draw the debug coffer manifest data as a table to make it a bit easier to read.
 	- Consider adding a way to flag crafting materials that only get used for housing or only get used for master book/starred crafts.
 		- This is getting a bit away from the main purpose of this plugin.  Think about whether to do it here or not.
+	- Consider an option to highlight the item category text (i.e., "Fishing Tackle").
+		- If added, let users choose which categories, and set colors for each category.
+		- Probably in the FilterGroup column (13) of the item sheet and defined in ItemSearchCategory, but need to double check.
 
 
 Rejected:

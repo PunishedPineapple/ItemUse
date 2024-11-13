@@ -5,7 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace ItemUse;
 
-internal class GrandCompanyUtils
+internal static class GrandCompanyUtils
 {
 	internal static unsafe GrandCompany GetCurrentGC()
 	{

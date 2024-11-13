@@ -5,7 +5,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 
 namespace ItemUse;
 
-internal class SeStringUtils
+internal static class SeStringUtils
 {
 	internal static void HighlightLastOccuranceOfText( ref SeString str, string tagStr, ushort color, ushort glowColor )
 	{
