@@ -91,6 +91,7 @@ public sealed class Plugin : IDalamudPlugin
 			{
 				if( subArgs[1] == "item" ) mUI.Window_Debug_ItemInfo.Toggle();
 				else if( subArgs[1] == "loaded" ) mUI.Window_Debug_LoadedItems.Toggle();
+				else if( subArgs[1] == "classjob" ) mUI.Window_Debug_ClassJob.Toggle();
 				else mUI.Window_Debug_General.Toggle();
 			}
 			else

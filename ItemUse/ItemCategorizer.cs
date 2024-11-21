@@ -166,10 +166,7 @@ internal static class ItemCategorizer
 
 		foreach( var row in fishSheet )
 		{
-			if( row.Item.IsValid )
-			{
-				mAquariumFish.Add( (Int32)row.Item.RowId );
-			}
+			if( row.Item.IsValid ) mAquariumFish.Add( (Int32)row.Item.RowId );
 		};
 
 		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
@@ -184,9 +181,9 @@ internal static class ItemCategorizer
 		{
 			HashSet<Int32> rowData = new();
 
-			foreach( var entry in row.Item )
+			foreach( var item in row.Item )
 			{
-				if( entry.IsValid ) rowData.Add( (int)entry.RowId );
+				if( item.IsValid ) rowData.Add( (int)item.RowId );
 			}
 
 			mEhcatlItems.UnionWith( rowData );

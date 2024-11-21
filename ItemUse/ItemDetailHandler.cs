@@ -77,8 +77,8 @@ internal unsafe static class ItemDetailHandler
 		}
 
 		if( pAddonItemDetail != null &&
-			pStringArrayData != null /*&&
-			!mBlockItemTooltip*/ )
+			pStringArrayData != null &&
+			!mBlockItemTooltip )
 		{
 			try
 			{
@@ -293,16 +293,19 @@ internal unsafe static class ItemDetailHandler
 			}
 			else
 			{
+				bool needExtraNewLine = false;
+
 				if( itemInfo.CofferGCJobs?.Count > 0 && mConfiguration.mShowGCCofferJobs )
 				{
 					str.AddIcon( GrandCompanyUtils.GetCurrentGCFontIcon() );
 					str.AddText( ": " );
 					ClassJobUtils.GetIconStringForJobs( ref str, itemInfo.CofferGCJobs, true, true );
 					str.Add( new NewLinePayload() );
+					needExtraNewLine = true;
 				}
 				if( itemInfo.CofferLeveJobs?.Count > 0 && mConfiguration.mShowLeveCofferJobs )
 				{
-					str.Add( new NewLinePayload() );
+					if( needExtraNewLine ) str.Add( new NewLinePayload() );
 					str.AddIcon( BitmapFontIcon.Dice );
 					str.AddText( ": " );
 					ClassJobUtils.GetIconStringForJobs( ref str, itemInfo.CofferLeveJobs, true, true );
