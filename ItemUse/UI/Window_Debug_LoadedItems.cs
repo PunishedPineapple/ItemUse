@@ -8,7 +8,7 @@ using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
 
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace ItemUse;
 
@@ -69,7 +69,7 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 
 		foreach( var item in ItemCategorizer.DEBUG_GetGCItems() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item )?.Name}" );
+			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
 		}
 	}
 
@@ -79,7 +79,7 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 
 		foreach( var item in ItemCategorizer.DEBUG_GetLeveItems() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item )?.Name}" );
+			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
 		}
 	}
 
@@ -89,7 +89,7 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 
 		foreach( var item in ItemCategorizer.DEBUG_GetEhcatlItems() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item )?.Name}" );
+			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
 		}
 	}
 
@@ -99,7 +99,7 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 
 		foreach( var item in ItemCategorizer.DEBUG_GetCraftingMaterials() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item )?.Name}" );
+			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
 		}
 	}
 
@@ -109,7 +109,7 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 
 		foreach( var item in ItemCategorizer.DEBUG_GetAquariumFish() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item )?.Name}" );
+			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
 		}
 	}
 
@@ -117,14 +117,20 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 	{
 		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
 
+		if( itemSheet == null )
+		{
+			ImGui.Text( "Item sheet is null!" );
+			return;
+		}
+
 		foreach( var cofferManifest in CofferManifests.DEBUG_GetCofferManifests() )
 		{
-			string str = mResolveCofferManifestItemNames ? itemSheet?.GetRow( (uint)cofferManifest.Key )?.Name : cofferManifest.Key.ToString();
+			string str = mResolveCofferManifestItemNames && itemSheet.HasRow( (uint)cofferManifest.Key) ? itemSheet.GetRow( (uint)cofferManifest.Key ).Name.ToString() : cofferManifest.Key.ToString();
 			str += ": ";
 
 			foreach( var item in cofferManifest.Value )
 			{
-				str += mResolveCofferManifestItemNames ? itemSheet?.GetRow( (uint)item )?.Name : item;
+				str += mResolveCofferManifestItemNames && itemSheet.HasRow( (uint)item ) ? itemSheet.GetRow( (uint)item ).Name.ToString() : item.ToString();
 				str += ", ";
 			}
 

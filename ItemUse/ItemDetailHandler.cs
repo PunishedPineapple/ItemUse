@@ -26,7 +26,7 @@ internal unsafe static class ItemDetailHandler
 		DalamudAPI.GameGui.HoveredItemChanged += OnHoveredItemChanged;
 
 		//	Sig and delegate stolen from Allagan Tools.
-		IntPtr fpGenerateItemDetail = DalamudAPI.SigScanner.ScanText( "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 20" );
+		IntPtr fpGenerateItemDetail = DalamudAPI.SigScanner.ScanText( "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 50 48 8B 42 28" );
 		if( fpGenerateItemDetail != IntPtr.Zero )
 		{
 			DalamudAPI.PluginLog.Information( $"GenerateItemDetail function signature found at 0x{fpGenerateItemDetail:X}." );
@@ -77,8 +77,8 @@ internal unsafe static class ItemDetailHandler
 		}
 
 		if( pAddonItemDetail != null &&
-			pStringArrayData != null &&
-			!mBlockItemTooltip )
+			pStringArrayData != null /*&&
+			!mBlockItemTooltip*/ )
 		{
 			try
 			{

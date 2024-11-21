@@ -9,7 +9,7 @@ using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
 
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace ItemUse;
 

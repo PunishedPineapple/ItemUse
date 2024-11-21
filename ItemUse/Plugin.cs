@@ -35,14 +35,14 @@ public sealed class Plugin : IDalamudPlugin
 
 		//	Event Subscription
 		mPluginInterface.LanguageChanged += OnLanguageChanged;
-		DalamudAPI.ClientState.Login += UITextColorSelector.CacheUITheme;
-		DalamudAPI.ClientState.Logout += UITextColorSelector.CacheUITheme;
+		DalamudAPI.ClientState.Login += OnLogin;
+		DalamudAPI.ClientState.Logout += OnLogout;
 	}
 
 	public void Dispose()
 	{
-		DalamudAPI.ClientState.Logout -= UITextColorSelector.CacheUITheme;
-		DalamudAPI.ClientState.Login -= UITextColorSelector.CacheUITheme;
+		DalamudAPI.ClientState.Logout -= OnLogout;
+		DalamudAPI.ClientState.Login -= OnLogin;
 		mPluginInterface.LanguageChanged -= OnLanguageChanged;
 		mPluginInterface.UiBuilder.Draw -= DrawUI;
 		mPluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
@@ -112,6 +112,16 @@ public sealed class Plugin : IDalamudPlugin
 	private void ToggleConfigUI()
 	{
 		mUI.Window_Settings.Toggle();
+	}
+
+	private void OnLogin()
+	{
+		UITextColorSelector.CacheUITheme();
+	}
+
+	private void OnLogout( int type, int code )
+	{
+		UITextColorSelector.CacheUITheme();
 	}
 
 	internal void ExportLocalizableStrings()

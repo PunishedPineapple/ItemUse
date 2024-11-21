@@ -1,27 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Lumina;
 using Lumina.Data;
 using Lumina.Excel;
+using Lumina.Text.ReadOnly;
 
 namespace ItemUse;
 
 //	Lumina defines this sheet with fixed fields for each job flag, which would require extra work on our
 //	part any time a new job is added.  Use our own definition that makes plugin maintenance simpler.
 
-public class ClassJobCategory_Alternate : Lumina.Excel.GeneratedSheets.ClassJobCategory
+//	Unfortunately, with the change to using structs, we can't just inherit from Lumina's implementation.  I'm
+//	not very comfortable with just copy-pasting the sheet attribute and some of the rest of this implementation,
+//	but idk what else to do right now.
+
+[Sheet( "ClassJobCategory", 0x65BBDB12 )]
+readonly internal struct ClassJobCategory_Alternate( ExcelPage page, uint offset, uint row ) : IExcelRow<ClassJobCategory_Alternate>
 {
-	public override void PopulateData( RowParser parser, GameData gameData, Language language )
+	public uint RowId => row;
+
+	public readonly ReadOnlySeString Name => page.ReadString( offset, offset );
+
+	public bool IncludesClassJob( int classJobID )
 	{
-		mClassJobFlags.Clear();
+		if( classJobID < 0 || classJobID >= ClassJobColumnCount ) return false;
 
-		for( int i = 1; i < parser.Sheet.ColumnCount; ++i )
-		{
-			mClassJobFlags.Add( parser.ReadColumn<bool>( i ) );
-		}
-
-		base.PopulateData( parser, gameData, language );
+		var newOffset = page.Sheet.GetColumnOffset( classJobID + 1 );
+		return page.ReadBool( newOffset );
 	}
 
-	public readonly List<bool> mClassJobFlags = new();
+	public readonly int ClassJobColumnCount => page.Sheet.Columns.Count - numColumnsBeforeClassJobs;
+
+	private const int numColumnsBeforeClassJobs = 1;
+
+	static ClassJobCategory_Alternate IExcelRow<ClassJobCategory_Alternate>.Create( ExcelPage page, uint offset, uint row ) =>
+		new( page, offset, row );
 }

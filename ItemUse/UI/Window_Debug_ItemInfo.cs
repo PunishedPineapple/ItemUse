@@ -8,7 +8,7 @@ using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
 
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace ItemUse;
 
@@ -47,7 +47,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 			else if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
 			else if( itemNQ > 500_000 ) itemNQ -= 500_000;
 
-			var itemName = itemSheet?.GetRow( (UInt32)itemNQ )?.Name ?? "Unknown";
+			var itemName = itemSheet.HasRow( (UInt32)itemNQ ) ? itemSheet.GetRow( (UInt32)itemNQ ).Name.ToString() : "Unknown";
 
 			ImGui.Text( $"Item ID: {itemInfo.ItemID}" );
 			ImGui.Text( $"Item ID (NQ): {itemNQ}" );
@@ -64,7 +64,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 			string str = "";
 			foreach( var job in jobs )
 			{
-				str += classJobsSheet.GetRow( (uint)job ).Abbreviation + ", ";
+				str += classJobsSheet.GetRow( (uint)job ).Abbreviation.ToString() + ", ";
 			}
 			ImGui.Text( $"Jobs: {str}" );
 
@@ -75,7 +75,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 				string cofferItemsStr = "";
 				foreach( var item in CofferManifests.GetCofferItems( itemNQ ) )
 				{
-					cofferItemsStr += itemSheet.GetRow( (uint)item ).Singular.ToString() + "\r\n";
+					cofferItemsStr += itemSheet.TryGetRow( (uint)item, out var itemRow ) ? itemRow.Singular.ToString() + "\r\n" : "";
 				}
 				ImGui.Text( $"Coffer Items:\r\n{cofferItemsStr}" );
 			}
@@ -87,7 +87,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 				string cofferGCJobsStr = "";
 				foreach( var job in itemInfo.CofferGCJobs )
 				{
-					cofferGCJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation + "\r\n";
+					cofferGCJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation.ToString() + "\r\n";
 				}
 				ImGui.Text( $"GC Jobs:\r\n{cofferGCJobsStr}" );
 			}
@@ -99,7 +99,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 				string cofferLeveJobsStr = "";
 				foreach( var job in itemInfo.CofferLeveJobs )
 				{
-					cofferLeveJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation + "\r\n";
+					cofferLeveJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation.ToString() + "\r\n";
 				}
 				ImGui.Text( $"Leve Jobs:\r\n{cofferLeveJobsStr}" );
 			}

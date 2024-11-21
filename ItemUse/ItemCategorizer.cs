@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 using Serilog.Events;
 
@@ -85,17 +85,17 @@ internal static class ItemCategorizer
 	internal static HashSet<int> GetJobsForItem( Int32 itemID )
 	{
 		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-		var classJobSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
 		var classjobCategorySheet = DalamudAPI.DataManager.GetExcelSheet<ClassJobCategory_Alternate>();
-
-		var classJobCategoryRowID = itemSheet.GetRow( (uint)itemID )?.ClassJobCategory?.Value?.RowId ?? 0;
-		var classJobFlags = classjobCategorySheet.GetRow( classJobCategoryRowID )?.mClassJobFlags;
 
 		HashSet<int> classJobs = new();
 
-		for( int i = 0; i < classJobFlags?.Count; ++i )
+		if( itemSheet.TryGetRow( (uint)itemID, out var itemRow ) &&
+			classjobCategorySheet.TryGetRow( itemRow.ClassJobCategory.Value.RowId, out var classJobCategoryRow ) )
 		{
-			if( classJobFlags[i] ) classJobs.Add( i );
+			for( int i = 0; i < classJobCategoryRow.ClassJobColumnCount; ++i )
+			{
+				if( classJobCategoryRow.IncludesClassJob( i ) ) classJobs.Add( i );
+			}
 		}
 
 		return classJobs;
@@ -109,87 +109,18 @@ internal static class ItemCategorizer
 		{
 			HashSet<Int32> rowData = new();
 
-			//***** TODO: Make our own sheet definition for this maybe.
-			//	Lumina has this sheet defined kind of questionably.
-			try
+			foreach( var mission in row.SupplyData )
 			{
-				rowData.UnionWith( row.Unknown0 );
-
-				rowData.Add( row.Unknown11 );
-				rowData.Add( row.Unknown12 );
-				rowData.Add( row.Unknown13 );
-				rowData.Add( row.Unknown14 );
-				rowData.Add( row.Unknown15 );
-				rowData.Add( row.Unknown16 );
-				rowData.Add( row.Unknown17 );
-				rowData.Add( row.Unknown18 );
-				rowData.Add( row.Unknown19 );
-				rowData.Add( row.Unknown20 );
-				rowData.Add( row.Unknown21 );
-				rowData.Add( row.Unknown22 );
-				rowData.Add( row.Unknown23 );
-				rowData.Add( row.Unknown24 );
-				rowData.Add( row.Unknown25 );
-				rowData.Add( row.Unknown26 );
-				rowData.Add( row.Unknown27 );
-				rowData.Add( row.Unknown28 );
-				rowData.Add( row.Unknown29 );
-				rowData.Add( row.Unknown30 );
-				rowData.Add( row.Unknown31 );
-				rowData.Add( row.Unknown32 );
-				rowData.Add( row.Unknown33 );
-				rowData.Add( row.Unknown34 );
-				rowData.Add( row.Unknown35 );
-				rowData.Add( row.Unknown36 );
-				rowData.Add( row.Unknown37 );
-				rowData.Add( row.Unknown38 );
-				rowData.Add( row.Unknown39 );
-				rowData.Add( row.Unknown40 );
-				rowData.Add( row.Unknown41 );
-				rowData.Add( row.Unknown42 );
-				rowData.Add( row.Unknown43 );
-				rowData.Add( row.Unknown44 );
-				rowData.Add( row.Unknown45 );
-				rowData.Add( row.Unknown46 );
-				rowData.Add( row.Unknown47 );
-				rowData.Add( row.Unknown48 );
-				rowData.Add( row.Unknown49 );
-				rowData.Add( row.Unknown50 );
-				rowData.Add( row.Unknown51 );
-				rowData.Add( row.Unknown52 );
-				rowData.Add( row.Unknown53 );
-				rowData.Add( row.Unknown54 );
-				rowData.Add( row.Unknown55 );
-				rowData.Add( row.Unknown56 );
-				rowData.Add( row.Unknown57 );
-				rowData.Add( row.Unknown58 );
-				rowData.Add( row.Unknown59 );
-				rowData.Add( row.Unknown60 );
-				rowData.Add( row.Unknown61 );
-				rowData.Add( row.Unknown62 );
-				rowData.Add( row.Unknown63 );
-				rowData.Add( row.Unknown64 );
-				rowData.Add( row.Unknown65 );
-			}
-			catch( Exception e )
-			{
-				DalamudAPI.PluginLog.Error( $"Error parsing GCSupplyDuty sheet row {row.RowId}:\r\n{e}" );
+				foreach( var item in mission.Item )
+				{
+					if( item.IsValid ) rowData.Add( (int)item.RowId );
+				}
 			}
 
 			mGCItems.UnionWith( rowData );
-
-			if( DalamudAPI.PluginLog.MinimumLogLevel <= LogEventLevel.Verbose )
-			{
-				string rowDataString = "";
-				foreach( var item in rowData )
-				{
-					rowDataString += item + ", ";
-				}
-				DalamudAPI.PluginLog.Verbose( $"GCSupply Row: {row.RowId}, Entries: {rowDataString}" );
-			}
 		}
 
-		//	Assume anything less than 100 is a quantity, since leves never require more than low double digits, and items below 100 are reserved for currencies.
+		//	Items below 100 are reserved items, like currency.  We should no longer have any issues with this, but there's no real downside to validating.
 		mGCItems.RemoveWhere( x => ( x < 100 ) );
 	}
 
@@ -199,18 +130,15 @@ internal static class ItemCategorizer
 
 		foreach( var row in leveSheet )
 		{
-			if( row?.UnkData3 != null )
+			HashSet<Int32> rowData = new();
+
+			foreach( var item in row.Item )
 			{
-				HashSet<Int32> rowData = new();
-
-				foreach( var item in row.UnkData3 )
-				{
-					if( item != null ) rowData.Add( item.Item );
-				}
-
-				mLeveItems.UnionWith( rowData );
+				if( item.IsValid ) rowData.Add( (int)item.RowId );
 			}
-		};
+
+			mLeveItems.UnionWith( rowData );
+		}
 
 		//	Items below 100 are reserved items, like currency.  We shouldn't have any issue with it on this sheet, but check just in case.
 		mLeveItems.RemoveWhere( x => ( x < 100 ) );
@@ -238,9 +166,9 @@ internal static class ItemCategorizer
 
 		foreach( var row in fishSheet )
 		{
-			if( row?.Item != null )
+			if( row.Item.IsValid )
 			{
-				mAquariumFish.Add( (Int32)row.Item.Row );
+				mAquariumFish.Add( (Int32)row.Item.RowId );
 			}
 		};
 
@@ -256,12 +184,9 @@ internal static class ItemCategorizer
 		{
 			HashSet<Int32> rowData = new();
 
-			if( row?.UnkData0 != null )
+			foreach( var entry in row.Item )
 			{
-				foreach( var entry in row.UnkData0 )
-				{
-					rowData.Add( entry.Item );
-				}
+				if( entry.IsValid ) rowData.Add( (int)entry.RowId );
 			}
 
 			mEhcatlItems.UnionWith( rowData );

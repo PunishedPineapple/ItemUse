@@ -6,7 +6,8 @@ using CheapLoc;
 
 using ImGuiNET;
 
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
+using Lumina.Extensions;
 
 namespace ItemUse;
 
@@ -78,7 +79,6 @@ internal class UITextColorSelector : IDisposable
 				{
 					foreach( var color in mUIColors )
 					{
-						if( color == null ) continue;
 						if( color.RowId == 0 ) continue;
 
 						var colorTextString = String.Format( Loc.Localize( "Settings: Dropdown - UI Text Color", "UI Color {0}" ), color.RowId );
@@ -107,28 +107,27 @@ internal class UITextColorSelector : IDisposable
 
 	protected uint GetDrawColorForColorID( ushort colorID, byte theme )
 	{
-		var color = mUIColors?.FirstOrDefault( x => x.RowId == colorID && x.RowId != 0, null );
-		return GetDrawColorForUIColor( color, theme );
+		if( mUIColors.TryGetFirst( x => x.RowId == colorID && x.RowId != 0, out UIColor color ) )
+		{
+			return GetDrawColorForUIColor( color, theme );
+		}
+		else
+		{
+			return ImGui.GetColorU32( ImGuiCol.Text );
+		}
 	}
 
 	protected uint GetDrawColorForUIColor( UIColor color, byte theme )
 	{
 		UInt32 retVal;
 
-		if( color != null )
+		retVal = theme switch
 		{
-			retVal = theme switch
-			{
-				1 => BinaryPrimitives.ReverseEndianness( color.UIGlow ),
-				2 => BinaryPrimitives.ReverseEndianness( color.Unknown2 ),
-				3 => BinaryPrimitives.ReverseEndianness( color.Unknown3 ),
-				_ => BinaryPrimitives.ReverseEndianness( color.UIForeground ),
-			};
-		}
-		else
-		{
-			retVal = ImGui.GetColorU32( ImGuiCol.Text );
-		}
+			1 => BinaryPrimitives.ReverseEndianness( color.UIGlow ),
+			2 => BinaryPrimitives.ReverseEndianness( color.Unknown0 ),
+			3 => BinaryPrimitives.ReverseEndianness( color.Unknown1 ),
+			_ => BinaryPrimitives.ReverseEndianness( color.UIForeground ),
+		};
 
 		//	Low-limit the alpha so that the user can always see something.
 		return retVal | 0x40_00_00_00;

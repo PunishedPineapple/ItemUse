@@ -2,7 +2,7 @@
 
 using Dalamud.Game;
 
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace ItemUse;
 
@@ -17,7 +17,8 @@ internal static class LocalizationHelpers
 				try
 				{
 					var addonSheet = DalamudAPI.DataManager.GetExcelSheet<Addon>();
-					mCraftingMaterialTag = addonSheet?.GetRow( 996 )?.Text ?? "Crafting Material";
+					mCraftingMaterialTag = addonSheet?.GetRow( 996 ).Text.ExtractText().Trim();
+					DalamudAPI.PluginLog.Debug( $"Crafting material tag in addon sheet: \"{mCraftingMaterialTag}\"" );
 				}
 				catch( Exception e )
 				{
