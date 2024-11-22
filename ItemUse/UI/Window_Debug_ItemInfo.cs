@@ -8,8 +8,6 @@ using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
 
-using Lumina.Excel.Sheets;
-
 namespace ItemUse;
 
 internal sealed class Window_Debug_ItemInfo : Window, IDisposable
@@ -38,20 +36,12 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 
 		if( itemInfo != null )
 		{
-			var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-			var classJobsSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
-
 			//	Handle special item IDs.
-			var itemNQ = itemInfo.ItemID;
-			if( itemNQ > 2_000_000 ) { }    //	These are EventItems, about which we don't really care.
-			else if( itemNQ > 1_000_000 ) itemNQ -= 1_000_000;
-			else if( itemNQ > 500_000 ) itemNQ -= 500_000;
-
-			var itemName = itemSheet.HasRow( (UInt32)itemNQ ) ? itemSheet.GetRow( (UInt32)itemNQ ).Name.ToString() : "Unknown";
+			var itemNQ = ItemUtils.GetNQItem( (uint)itemInfo.ItemID );
 
 			ImGui.Text( $"Item ID: {itemInfo.ItemID}" );
 			ImGui.Text( $"Item ID (NQ): {itemNQ}" );
-			ImGui.Text( $"Item Name: {itemName}" );
+			ImGui.Text( $"Item Name: {ItemUtils.GetUnformattedName( (uint)itemInfo.ItemID )}" );
 			ImGui.Text( $"GC: {itemInfo.IsGCItem}" );
 			ImGui.Text( $"Leve: {itemInfo.IsLeveItem}" );
 			ImGui.Text( $"Ehcatl: {itemInfo.IsEhcatlItem}" );
@@ -60,22 +50,22 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 
 			ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
-			var jobs = ItemCategorizer.GetJobsForItem( itemNQ );
+			var jobs = ItemCategorizer.GetJobsForItem( (int)itemNQ );
 			string str = "";
 			foreach( var job in jobs )
 			{
-				str += classJobsSheet.GetRow( (uint)job ).Abbreviation.ToString() + ", ";
+				str += ClassJobUtils.GetAbbreviation( (uint)job ) + ", ";
 			}
 			ImGui.Text( $"Jobs: {str}" );
 
 			ImGuiHelpers.ScaledDummy( ImGuiUtils.SectionSpacingSize );
 
-			if( CofferManifests.ItemIsKnownCoffer( itemNQ ) )
+			if( CofferManifests.ItemIsKnownCoffer( (int)itemNQ ) )
 			{
 				string cofferItemsStr = "";
-				foreach( var item in CofferManifests.GetCofferItems( itemNQ ) )
+				foreach( var item in CofferManifests.GetCofferItems( (int)itemNQ ) )
 				{
-					cofferItemsStr += itemSheet.TryGetRow( (uint)item, out var itemRow ) ? itemRow.Singular.ToString() + "\r\n" : "";
+					cofferItemsStr += ItemUtils.GetUnformattedName( (uint)item ) + "\r\n";
 				}
 				ImGui.Text( $"Coffer Items:\r\n{cofferItemsStr}" );
 			}
@@ -87,7 +77,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 				string cofferGCJobsStr = "";
 				foreach( var job in itemInfo.CofferGCJobs )
 				{
-					cofferGCJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation.ToString() + "\r\n";
+					cofferGCJobsStr += ClassJobUtils.GetAbbreviation( (uint)job ) + "\r\n";
 				}
 				ImGui.Text( $"GC Jobs:\r\n{cofferGCJobsStr}" );
 			}
@@ -99,7 +89,7 @@ internal sealed class Window_Debug_ItemInfo : Window, IDisposable
 				string cofferLeveJobsStr = "";
 				foreach( var job in itemInfo.CofferLeveJobs )
 				{
-					cofferLeveJobsStr += classJobsSheet.GetRow( (uint)job ).Abbreviation.ToString() + "\r\n";
+					cofferLeveJobsStr += ClassJobUtils.GetAbbreviation( (uint)job ) + "\r\n";
 				}
 				ImGui.Text( $"Leve Jobs:\r\n{cofferLeveJobsStr}" );
 			}

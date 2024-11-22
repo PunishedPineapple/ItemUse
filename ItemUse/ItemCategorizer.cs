@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using Lumina.Excel.Sheets;
 
-using Serilog.Events;
-
 namespace ItemUse;
 
 internal static class ItemCategorizer

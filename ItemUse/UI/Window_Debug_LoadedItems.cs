@@ -8,8 +8,6 @@ using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
 
-using Lumina.Excel.Sheets;
-
 namespace ItemUse;
 
 internal sealed class Window_Debug_LoadedItems : Window, IDisposable
@@ -65,72 +63,54 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 
 	private void DrawGCItems()
 	{
-		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-
 		foreach( var item in ItemCategorizer.DEBUG_GetGCItems() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
+			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
 		}
 	}
 
 	private void DrawLeveItems()
 	{
-		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-
 		foreach( var item in ItemCategorizer.DEBUG_GetLeveItems() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
+			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
 		}
 	}
 
 	private void DrawEhcatlItems()
 	{
-		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-
 		foreach( var item in ItemCategorizer.DEBUG_GetEhcatlItems() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
+			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
 		}
 	}
 
 	private void DrawCraftingMaterials()
 	{
-		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-
 		foreach( var item in ItemCategorizer.DEBUG_GetCraftingMaterials() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
+			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
 		}
 	}
 
 	private void DrawAquariumFish()
 	{
-		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-
 		foreach( var item in ItemCategorizer.DEBUG_GetAquariumFish() )
 		{
-			ImGui.Text( $"{item}: {itemSheet?.GetRow( (uint)item ).Name.ToString()}" );
+			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
 		}
 	}
 
 	private void DrawCofferManifests()
 	{
-		var itemSheet = DalamudAPI.DataManager.GetExcelSheet<Item>();
-
-		if( itemSheet == null )
-		{
-			ImGui.Text( "Item sheet is null!" );
-			return;
-		}
-
 		foreach( var cofferManifest in CofferManifests.DEBUG_GetCofferManifests() )
 		{
-			string str = mResolveCofferManifestItemNames && itemSheet.HasRow( (uint)cofferManifest.Key) ? itemSheet.GetRow( (uint)cofferManifest.Key ).Name.ToString() : cofferManifest.Key.ToString();
+			string str = mResolveCofferManifestItemNames ? ItemUtils.GetUnformattedName( (uint)cofferManifest.Key ) : cofferManifest.Key.ToString();
 			str += ": ";
 
 			foreach( var item in cofferManifest.Value )
 			{
-				str += mResolveCofferManifestItemNames && itemSheet.HasRow( (uint)item ) ? itemSheet.GetRow( (uint)item ).Name.ToString() : item.ToString();
+				str += mResolveCofferManifestItemNames ? ItemUtils.GetUnformattedName( (uint)item ) : item.ToString();
 				str += ", ";
 			}
 

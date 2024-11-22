@@ -8,8 +8,6 @@ using Dalamud.Interface.Windowing;
 
 using ImGuiNET;
 
-using Lumina.Excel.Sheets;
-
 namespace ItemUse;
 
 internal sealed class Window_Debug_ClassJob : Window, IDisposable
@@ -35,7 +33,6 @@ internal sealed class Window_Debug_ClassJob : Window, IDisposable
 	public override void Draw()
 	{
 		var classjobCategorySheet = DalamudAPI.DataManager.GetExcelSheet<ClassJobCategory_Alternate>();
-		var classjobSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
 
 		ImGui.Checkbox( "Resolve ClassJob Abbreviations", ref mResolveClassJobAbbreviations );
 
@@ -52,9 +49,9 @@ internal sealed class Window_Debug_ClassJob : Window, IDisposable
 			{
 				if( row.IncludesClassJob( i ) )
 				{
-					if( mResolveClassJobAbbreviations && classjobSheet.TryGetRow( (uint)i, out var classJobRow ) )
+					if( mResolveClassJobAbbreviations )
 					{
-						str += $"{classJobRow.Abbreviation.ExtractText()}, ";
+						str += $"{ClassJobUtils.GetAbbreviation( (uint)i )}, ";
 					}
 					else
 					{

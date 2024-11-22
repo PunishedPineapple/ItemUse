@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
 
+using Lumina.Excel;
 using Lumina.Excel.Sheets;
 
 namespace ItemUse;
@@ -148,42 +150,52 @@ internal static class ClassJobUtils
 			if( mClassJobDict == null )
 			{
 				mClassJobDict = new();
-				Lumina.Excel.ExcelSheet<ClassJob> classJobSheet_En = DalamudAPI.DataManager.GetExcelSheet<ClassJob>( Dalamud.Game.ClientLanguage.English );
-				Lumina.Excel.ExcelSheet<ClassJob> classJobSheet_Local = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
-				for( uint i = 0; i < classJobSheet_En.Count; ++i )
+				ExcelSheet<ClassJob> classJobSheet_En = DalamudAPI.DataManager.GetExcelSheet<ClassJob>( Dalamud.Game.ClientLanguage.English );
+
+				foreach( var row in classJobSheet_En )
 				{
-					if( classJobSheet_En.HasRow( i ) )
-					{
-						var row = classJobSheet_En.GetRow( i );
+					ClassJobSortCategory sortCategory;
+					if( row.UIPriority == 0 ) sortCategory = ClassJobSortCategory.Other;
+					else if( row.UIPriority <= 10 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Tank : ClassJobSortCategory.Class_Tank;
+					else if( row.UIPriority <= 20 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Healer : ClassJobSortCategory.Class_Healer;
+					else if( row.UIPriority <= 30 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Melee : ClassJobSortCategory.Class_Melee;
+					else if( row.UIPriority <= 40 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Ranged : ClassJobSortCategory.Class_Ranged;
+					else if( row.UIPriority <= 50 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Caster : ClassJobSortCategory.Class_Caster;
+					else sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.HandLand : ClassJobSortCategory.HandLand;
 
-						ClassJobSortCategory sortCategory;
-						if( row.UIPriority == 0 ) sortCategory = ClassJobSortCategory.Other;
-						else if( row.UIPriority <= 10 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Tank : ClassJobSortCategory.Class_Tank;
-						else if( row.UIPriority <= 20 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Healer : ClassJobSortCategory.Class_Healer;
-						else if( row.UIPriority <= 30 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Melee : ClassJobSortCategory.Class_Melee;
-						else if( row.UIPriority <= 40 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Ranged : ClassJobSortCategory.Class_Ranged;
-						else if( row.UIPriority <= 50 ) sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.Job_Caster : ClassJobSortCategory.Class_Caster;
-						else sortCategory = row.JobIndex > 0 ? ClassJobSortCategory.HandLand : ClassJobSortCategory.HandLand;
+					//	This needs to be unique (for use as a key).
+					string abbreviation_En = row.Abbreviation.ToString();
+					if( abbreviation_En.IsNullOrWhitespace() ) abbreviation_En = $"UNK{row.RowId}";
 
-						//	This needs to be unique (for use as a key).
-						string abbreviation_En = row.Abbreviation.ToString();
-						if( abbreviation_En.IsNullOrWhitespace() ) abbreviation_En = $"UNK{i}";
-
-						mClassJobDict.TryAdd( (int)i,
-							new ClassJobData
-							{
-								Abbreviation = classJobSheet_Local.GetRow( i ).Abbreviation.ToString(),
-								Abbreviation_En = abbreviation_En,
-								DefaultSelected = row.DohDolJobIndex < 0,
-								SortCategory = sortCategory,
-								UIPriority = row.UIPriority,
-							} );
-					}
+					mClassJobDict.TryAdd( (int)row.RowId,
+						new ClassJobData
+						{
+							Abbreviation = GetAbbreviation( row.RowId ),
+							Abbreviation_En = abbreviation_En,
+							DefaultSelected = row.DohDolJobIndex < 0,
+							SortCategory = sortCategory,
+							UIPriority = row.UIPriority,
+						} );
 				}
 			}
 
 			return mClassJobDict;
 		}
+	}
+
+	internal static string GetAbbreviation( UInt32 classJob )
+	{
+		ExcelSheet<ClassJob> classJobSheet = DalamudAPI.DataManager.GetExcelSheet<ClassJob>();
+
+		string abbr = null;
+
+		if( classJobSheet.TryGetRow( classJob, out var row ) )
+		{
+			abbr = row.Abbreviation.ToDalamudString().TextValue;
+		}
+
+		if( abbr.IsNullOrWhitespace() ) return $"UNK{row.RowId}";
+		else return abbr;
 	}
 
 	internal static HashSet<int> Classes

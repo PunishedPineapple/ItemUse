@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Lumina;
-using Lumina.Data;
-using Lumina.Excel;
+﻿using Lumina.Excel;
 using Lumina.Text.ReadOnly;
 
 namespace ItemUse;
@@ -26,8 +21,8 @@ readonly internal struct ClassJobCategory_Alternate( ExcelPage page, uint offset
 	{
 		if( classJobID < 0 || classJobID >= ClassJobColumnCount ) return false;
 
-		var newOffset = offset + page.Sheet.GetColumnOffset( classJobID + 1 );
-		return page.ReadBool( (nuint)newOffset );
+		var newOffset = offset + page.Sheet.GetColumnOffset( classJobID + numColumnsBeforeClassJobs );
+		return page.ReadBool( newOffset );
 	}
 
 	public readonly int ClassJobColumnCount => page.Sheet.Columns.Count - numColumnsBeforeClassJobs;
