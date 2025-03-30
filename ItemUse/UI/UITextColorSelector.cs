@@ -123,10 +123,10 @@ internal class UITextColorSelector : IDisposable
 
 		retVal = theme switch
 		{
-			1 => BinaryPrimitives.ReverseEndianness( color.UIGlow ),
-			2 => BinaryPrimitives.ReverseEndianness( color.Unknown0 ),
-			3 => BinaryPrimitives.ReverseEndianness( color.Unknown1 ),
-			_ => BinaryPrimitives.ReverseEndianness( color.UIForeground ),
+			1 => BinaryPrimitives.ReverseEndianness( color.Light ),
+			2 => BinaryPrimitives.ReverseEndianness( color.ClassicFF ),
+			3 => BinaryPrimitives.ReverseEndianness( color.ClearBlue ),
+			_ => BinaryPrimitives.ReverseEndianness( color.Dark ),
 		};
 
 		//	Low-limit the alpha so that the user can always see something.
