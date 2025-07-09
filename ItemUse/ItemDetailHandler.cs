@@ -130,7 +130,7 @@ internal unsafe static class ItemDetailHandler
 				}
 				catch
 				{
-					//	If Logging threw, we can't really do anything about it besides make sure that the hook completes.
+					//	If logging threw, we can't really do anything about it besides make sure that the hook completes.
 				}
 			}
 		}
@@ -243,12 +243,11 @@ internal unsafe static class ItemDetailHandler
 		}
 	}
 
-	//***** TODO: Probably eventually get rid of this and make them real icons.
 	private static void SetItemFlagsString( ItemInfo itemInfo )
 	{
 		SeStringBuilder str = new();
 
-		if( mConfiguration.mShowGCItemsFlag && ( itemInfo?.IsGCItem ?? false ) ) str.AddIcon( GrandCompanyUtils.GetCurrentGCFontIcon() );
+		if( mConfiguration.mShowGCItemsFlag && ( itemInfo?.IsGCItem ?? false ) ) str.AddIcon( GrandCompanyUtils.CurrentGCFontIcon );
 		if( mConfiguration.mShowLeveItemsFlag && ( itemInfo?.IsLeveItem ?? false ) ) str.AddIcon( BitmapFontIcon.Dice );
 		if( mConfiguration.mShowEhcatlItemsFlag && ( itemInfo?.IsEhcatlItem ?? false ) ) str.AddIcon( BitmapFontIcon.FlyZone );
 		if( mConfiguration.mShowCraftingMaterialsFlag && ( itemInfo?.IsCraftingMaterial ?? false ) ) str.AddIcon( BitmapFontIcon.Crafter );
@@ -297,12 +296,13 @@ internal unsafe static class ItemDetailHandler
 
 				if( itemInfo.CofferGCJobs?.Count > 0 && mConfiguration.mShowGCCofferJobs )
 				{
-					str.AddIcon( GrandCompanyUtils.GetCurrentGCFontIcon() );
+					str.AddIcon( GrandCompanyUtils.CurrentGCFontIcon );
 					str.AddText( ": " );
 					ClassJobUtils.GetIconStringForJobs( ref str, itemInfo.CofferGCJobs, true, true );
 					str.Add( new NewLinePayload() );
 					needExtraNewLine = true;
 				}
+
 				if( itemInfo.CofferLeveJobs?.Count > 0 && mConfiguration.mShowLeveCofferJobs )
 				{
 					if( needExtraNewLine ) str.Add( new NewLinePayload() );

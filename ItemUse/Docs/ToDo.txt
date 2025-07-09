@@ -1,4 +1,5 @@
 ﻿Bugs:
+	- Fix ordering issue with Allagan Tools.
 
 
 To Do:
@@ -6,6 +7,7 @@ To Do:
 		- This may not be feasible with how complicated it would make things to not have coffer information as a simple SeString.
 	- Flag items above a certain vendor sale gil threshold?
 		- Most items like this have the "Exchangeable for gil." tag, although ones with other uses (i.e., fieldcraft and battlecraft demimateria) do not.
+			- The new Esoteric Coin from OC also does not have this tag.
 	- Add Ehcatl icon to plugin icon.
 		- Or maybe gil icon if we do add the gil flag.
 	- Is there a better addon lifecycle point to hook than update?  Update has been getting called more often than expected.

@@ -29,8 +29,5 @@ internal static class GrandCompanyUtils
 		};
 	}
 
-	internal static BitmapFontIcon GetCurrentGCFontIcon()
-	{
-		return GetGCFontIcon( GetCurrentGC() );
-	}
+	internal static BitmapFontIcon CurrentGCFontIcon => GetGCFontIcon( GetCurrentGC() );
 }
