@@ -1,4 +1,4 @@
-﻿<Project Sdk="Dalamud.NET.Sdk/12.0.2">
+﻿<Project Sdk="Dalamud.NET.Sdk/13.0.0">
 
 	<!-- Compiler Settings -->
 	<PropertyGroup>
@@ -13,7 +13,7 @@
 
 	<!-- Project Information -->
 	<PropertyGroup>
-		<Version>1.0.0.3</Version>
+		<Version>1.0.1.0</Version>
 		<Authors>PunishedPineapple</Authors>
 		<Product />
 		<Copyright>Copyright © PunishedPineapple 2024-2025</Copyright>

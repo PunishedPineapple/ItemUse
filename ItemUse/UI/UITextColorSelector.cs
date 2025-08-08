@@ -4,7 +4,8 @@ using System.Linq;
 
 using CheapLoc;
 
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 
 using Lumina.Excel.Sheets;
 using Lumina.Extensions;
@@ -39,9 +40,20 @@ internal class UITextColorSelector : IDisposable
 
 		try
 		{
-			if( ImGui.ArrowButton( "CraftingMaterialTextColorButton", mShowColorSelectors ? ImGuiDir.Down : ImGuiDir.Right ) )
+			//	The new ImGUI stuff is missing ArrowButton, so we have to make our own for now.
+			try
 			{
-				mShowColorSelectors = !mShowColorSelectors;
+				ImGui.PushFont( UiBuilder.IconFont );
+				string iconStr = mShowColorSelectors ? "\uF078" : "\uF054";
+				//if( ImGui.ArrowButton( "CraftingMaterialTextColorButton", mShowColorSelectors ? ImGuiDir.Down : ImGuiDir.Right ) )
+				if( ImGui.Button( iconStr ) )
+				{
+					mShowColorSelectors = !mShowColorSelectors;
+				}
+			}
+			finally
+			{
+				ImGui.PopFont();
 			}
 
 			ImGuiUtils.TooltipLastItem( Loc.Localize( "Help: Settings - Highlight Color Dropdown", "Click here to show/hide the text colors." ) );

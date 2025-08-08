@@ -98,7 +98,7 @@ internal static unsafe class AtkNodeHelpers
 		}
 	}
 
-	internal static AtkTextNode* CreateOrphanTextNode( uint nodeID, TextFlags textFlags = TextFlags.Edge, TextFlags2 textFlags2 = 0 )
+	internal static AtkTextNode* CreateOrphanTextNode( uint nodeID, TextFlags textFlags = TextFlags.Edge )
 	{
 		//	Just use some sane defaults.
 		var pNewNode = (AtkTextNode*)IMemorySpace.GetUISpace()->Malloc((ulong)sizeof(AtkTextNode), 8);
@@ -118,8 +118,7 @@ internal static unsafe class AtkNodeHelpers
 			pNewNode->CharSpacing = 1;
 			pNewNode->AlignmentFontType = (byte)AlignmentType.BottomLeft;
 			pNewNode->FontSize = 12;
-			pNewNode->TextFlags = (byte)textFlags;
-			pNewNode->TextFlags2 = (byte)textFlags2;
+			pNewNode->TextFlags = textFlags;
 
 			pNewNode->AtkResNode.NodeId = nodeID;
 

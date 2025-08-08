@@ -48,7 +48,7 @@ internal unsafe static class ItemDetailHandler
 
 		DalamudAPI.AddonLifecycle.UnregisterListener( AddonEvent.PostUpdate, "ItemDetail", ItemDetailUpdateCallback );
 		DalamudAPI.GameGui.HoveredItemChanged -= OnHoveredItemChanged;
-		AtkNodeHelpers.RemoveTextNode( (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ), mItemFlagsTextNodeID );
+		AtkNodeHelpers.RemoveTextNode( (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ).Address, mItemFlagsTextNodeID );
 
 		if( mpItemFlagsString != null ) Marshal.FreeHGlobal( (nint)mpItemFlagsString );
 		mConfiguration = null;
@@ -175,7 +175,7 @@ internal unsafe static class ItemDetailHandler
 
 	private unsafe static void UpdateItemFlagsTextNode( bool show = true )
 	{
-		AtkUnitBase* pAddon = (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" );
+		AtkUnitBase* pAddon = (AtkUnitBase*)DalamudAPI.GameGui.GetAddonByName( "ItemDetail" ).Address;
 		AtkTextNode* pNode = null;
 		AtkResNode* pTitleBarNode = null;
 		AtkResNode* pIconsContainerNode = null;
@@ -227,7 +227,7 @@ internal unsafe static class ItemDetailHandler
 					pNode->FontSize = 14;
 					pNode->AlignmentType = AlignmentType.BottomRight;
 					pNode->FontType = FontType.Axis;
-					pNode->TextFlags = (byte)TextFlags.Bold;
+					pNode->TextFlags = TextFlags.Bold;
 					pNode->LineSpacing = 1;
 					pNode->CharSpacing = 1;
 

@@ -9,7 +9,7 @@ internal static class GrandCompanyUtils
 {
 	internal static unsafe GrandCompany GetCurrentGC()
 	{
-		if( DalamudAPI.ClientState.IsLoggedIn && UIState.Instance() != null && UIState.Instance()->PlayerState.IsLoaded > 0 )
+		if( DalamudAPI.ClientState.IsLoggedIn && UIState.Instance() != null && UIState.Instance()->PlayerState.IsLoaded )
 		{
 			return (GrandCompany)UIState.Instance()->PlayerState.GrandCompany;
 		}

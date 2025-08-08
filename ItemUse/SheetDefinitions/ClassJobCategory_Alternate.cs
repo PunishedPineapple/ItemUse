@@ -7,10 +7,9 @@ namespace ItemUse;
 //	part any time a new job is added.  Use our own definition that makes plugin maintenance simpler.
 
 //	Unfortunately, with the change to using structs, we can't just inherit from Lumina's implementation anymore.
-//	I'm not very comfortable with just copy-pasting the sheet attribute and some of the rest of this implementation,
-//	but idk what else to do right now.
+//	I'm not very comfortable with just copy-pasting part of the definition, but idk what else to do right now.
 
-[Sheet( "ClassJobCategory", 0x65BBDB12 )]
+[Sheet( "ClassJobCategory", 0x6733E334 )]
 readonly internal struct ClassJobCategory_Alternate( ExcelPage page, uint offset, uint row ) : IExcelRow<ClassJobCategory_Alternate>
 {
 	public uint RowId => row;

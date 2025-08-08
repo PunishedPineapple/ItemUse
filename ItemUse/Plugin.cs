@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using CheapLoc;
 
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
+
+using Lumina.Excel;
 
 namespace ItemUse;
 
@@ -15,6 +18,19 @@ public sealed class Plugin : IDalamudPlugin
 		//	API Access
 		pluginInterface.Create<DalamudAPI>();
 		mPluginInterface = pluginInterface;
+
+		//	Check our custom sheet hash and throw right away if it does not match so that
+		//	we do not have any hidden problems.  I *really* do not like this, but I am too
+		//	stupid to come up with a proper solution right now.
+		var classJobSheetAttr = (SheetAttribute)Attribute.GetCustomAttribute( typeof( Lumina.Excel.Sheets.ClassJobCategory ), typeof( SheetAttribute ) );
+		var classJobSheetAltAttr = (SheetAttribute)Attribute.GetCustomAttribute( typeof( ClassJobCategory_Alternate ), typeof( SheetAttribute ) );
+
+		if( classJobSheetAltAttr == null || classJobSheetAttr?.ColumnHash != classJobSheetAltAttr?.ColumnHash )
+		{
+			string str = $"\"ClassJobCategory_Alternate\" has an unexpected hash ({classJobSheetAltAttr?.ColumnHash}).  This plugin most likely needs to be updated.";
+			DalamudAPI.PluginLog.Fatal( str );
+			throw new( str );
+		}
 
 		//	Configuration
 		mConfiguration = mPluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -83,7 +99,7 @@ public sealed class Plugin : IDalamudPlugin
 
 	private void ProcessTextCommand( string command, string args )
 	{
-		if( args.ToLower().Contains( SubcommandName_Debug.ToLower() ) )
+		if( args.Contains( SubcommandName_Debug.ToLower(), System.StringComparison.InvariantCultureIgnoreCase ) )
 		{
 			var subArgs = args.Split( ' ' );
 

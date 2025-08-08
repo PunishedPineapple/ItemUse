@@ -66,11 +66,11 @@ internal static unsafe class StringArrayDataHelpers
 		{
 			try
 			{
-				return SeString.Parse( pStringArrayData->StringArray[stringIndex] );
+				return SeString.Parse( pStringArrayData->StringArray[stringIndex].AsSpan() );
 			}
 			catch( Exception e )
 			{
-				DalamudAPI.PluginLog.Error( $"Uknown error setting AtkArrayData string [0x{(nint)pStringArrayData:X}, {stringIndex}]:\r\n{e}" );
+				DalamudAPI.PluginLog.Error( $"Uknown error while parsing AtkArrayData string [0x{(nint)pStringArrayData:X}, {stringIndex}]:\r\n{e}" );
 			}
 		}
 
