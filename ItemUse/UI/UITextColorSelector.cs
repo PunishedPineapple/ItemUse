@@ -133,11 +133,16 @@ internal class UITextColorSelector : IDisposable
 	{
 		UInt32 retVal;
 
+		//***** TODO: Probably just get the column by index rather than using column names that we have to keep up to date (like we do for ClassJob).
 		retVal = theme switch
 		{
 			1 => BinaryPrimitives.ReverseEndianness( color.Light ),
 			2 => BinaryPrimitives.ReverseEndianness( color.ClassicFF ),
 			3 => BinaryPrimitives.ReverseEndianness( color.ClearBlue ),
+			4 => BinaryPrimitives.ReverseEndianness( color.Unknown0 ),
+			5 => BinaryPrimitives.ReverseEndianness( color.Unknown1 ),
+			6 => BinaryPrimitives.ReverseEndianness( color.Unknown2 ),
+			7 => BinaryPrimitives.ReverseEndianness( color.Unknown3 ),
 			_ => BinaryPrimitives.ReverseEndianness( color.Dark ),
 		};
 
@@ -145,7 +150,8 @@ internal class UITextColorSelector : IDisposable
 		return retVal | 0x40_00_00_00;
 	}
 
-	//	We want to cache this on login so that the colors are always correct for the currently-displayed theme.
+	//	We want to cache this on login so that the colors are always correct for the currently-
+	//	displayed theme (since a configuration change may not yet have taken effect).
 	public static void CacheUITheme()
 	{
 		if( DalamudAPI.ClientState.IsLoggedIn )

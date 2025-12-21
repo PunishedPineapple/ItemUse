@@ -32,8 +32,8 @@ internal sealed class Window_Settings : Window, IDisposable
 
 	public void Dispose()
 	{
-		mCraftingMaterialHighlightColorSelector.Dispose();
-		mAquariumFishHighlightColorSelector.Dispose();
+		mCraftingMaterialHighlightColorSelector?.Dispose();
+		mAquariumFishHighlightColorSelector?.Dispose();
 	}
 
 	public override void Draw()

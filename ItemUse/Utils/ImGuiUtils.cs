@@ -4,14 +4,14 @@ namespace ItemUse;
 
 internal static class ImGuiUtils
 {
-	internal static void HelpMarker( string description, bool sameLine = true, string marker = "(?)" )
+	public static void HelpMarker( string description, bool sameLine = true, string marker = "(?)" )
 	{
 		if( sameLine ) ImGui.SameLine();
 		ImGui.TextDisabled( marker );
 		TooltipLastItem( description );
 	}
 
-	internal static void TooltipLastItem( string description )
+	public static void TooltipLastItem( string description )
 	{
 		if( ImGui.IsItemHovered() )
 		{
@@ -23,5 +23,5 @@ internal static class ImGuiUtils
 		}
 	}
 
-	internal const float SectionSpacingSize = 20f;
+	public const float SectionSpacingSize = 20f;
 }

@@ -20,6 +20,7 @@ To Do:
 	- Consider an option to highlight the item category text (i.e., "Fishing Tackle").
 		- If added, let users choose which categories, and set colors for each category.
 		- Probably in the FilterGroup column (13) of the item sheet and defined in ItemSearchCategory, but need to double check.
+	- Add buttons on the coffer debug page to link each coffer in chat so that we do not have to rely on item search plugin to do testing.
 
 
 Rejected:

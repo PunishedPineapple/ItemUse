@@ -12,6 +12,8 @@ namespace ItemUse;
 [Sheet( "ClassJobCategory", 0x6733E334 )]
 readonly internal struct ClassJobCategory_Alternate( ExcelPage page, uint offset, uint row ) : IExcelRow<ClassJobCategory_Alternate>
 {
+	public ExcelPage ExcelPage => page;
+	public uint RowOffset => offset;
 	public uint RowId => row;
 
 	public readonly ReadOnlySeString Name => page.ReadString( offset, offset );
