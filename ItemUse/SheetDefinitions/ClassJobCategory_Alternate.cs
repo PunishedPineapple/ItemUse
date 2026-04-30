@@ -1,4 +1,7 @@
-﻿using Lumina.Excel;
+﻿using System;
+
+using Lumina.Data.Structs.Excel;
+using Lumina.Excel;
 using Lumina.Text.ReadOnly;
 
 namespace ItemUse;
@@ -6,8 +9,9 @@ namespace ItemUse;
 //	Lumina defines this sheet with fixed fields for each job flag, which would require extra work on our
 //	part any time a new job is added.  Use our own definition that makes plugin maintenance simpler.
 
-//	Unfortunately, with the change to using structs, we can't just inherit from Lumina's implementation anymore.
-//	I'm not very comfortable with just copy-pasting part of the definition, but idk what else to do right now.
+//	Now that you can extend structs, it may be better to turn this into an extension class like with UIColor,
+//	but we will leave it as-is for now.  If we change it, make sure to keep column hash comparison working
+//	because otherwise we could be silently showing incorrect data to the player.
 
 [Sheet( "ClassJobCategory", 0x6733E334 )]
 readonly internal struct ClassJobCategory_Alternate( ExcelPage page, uint offset, uint row ) : IExcelRow<ClassJobCategory_Alternate>
@@ -22,8 +26,21 @@ readonly internal struct ClassJobCategory_Alternate( ExcelPage page, uint offset
 	{
 		if( classJobID < 0 || classJobID >= ClassJobColumnCount ) return false;
 
-		var newOffset = offset + page.Sheet.GetColumnOffset( classJobID + numColumnsBeforeClassJobs );
-		return page.ReadBool( newOffset );
+		int classJobColumnIndex = classJobID + numColumnsBeforeClassJobs;
+
+		if( classJobColumnIndex < 0 || classJobColumnIndex >= page.Sheet.Columns.Count )
+		{
+			throw new Exception( $"ClassJobCategory sheet column {classJobColumnIndex} is out of range!" );
+		}
+		else if( page.Sheet.Columns[classJobColumnIndex].Type != ExcelColumnDataType.Bool )
+		{
+			throw new Exception( $"ClassJobCategory sheet column {classJobColumnIndex} is not of the expected type!" );
+		}
+		else
+		{
+			var valueOffset = offset + page.Sheet.GetColumnOffset( classJobColumnIndex );
+			return page.ReadBool( valueOffset );
+		}
 	}
 
 	public readonly int ClassJobColumnCount => page.Sheet.Columns.Count - numColumnsBeforeClassJobs;

@@ -21,7 +21,8 @@ public sealed class Plugin : IDalamudPlugin
 
 		//	Check our custom sheet hash and throw right away if it does not match so that
 		//	we do not have any hidden problems.  I *really* do not like this, but I am too
-		//	stupid to come up with a proper solution right now.
+		//	stupid to come up with a proper solution right now.  We do not need to bother for
+		//	the color sheet since it would only display the wrong color in ImGui or throw.
 		var classJobSheetAttr = (SheetAttribute)Attribute.GetCustomAttribute( typeof( Lumina.Excel.Sheets.ClassJobCategory ), typeof( SheetAttribute ) );
 		var classJobSheetAltAttr = (SheetAttribute)Attribute.GetCustomAttribute( typeof( ClassJobCategory_Alternate ), typeof( SheetAttribute ) );
 
