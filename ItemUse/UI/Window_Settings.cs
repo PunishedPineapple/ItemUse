@@ -3,11 +3,10 @@ using System.Linq;
 
 using CheapLoc;
 
+using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-
-using Dalamud.Bindings.ImGui;
 
 using Lumina.Excel.Sheets;
 
