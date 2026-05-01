@@ -4,6 +4,7 @@ using System.Numerics;
 using CheapLoc;
 
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 
@@ -60,50 +61,58 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 		}
 	}
 
+	private void DrawDebugItem( Int32 itemId )
+	{
+		if( ImGui.SmallButton( $"Link###ItemId_{itemId}" ) )
+		{
+			DalamudAPI.ChatGui.Print( new()
+			{
+				Type = Dalamud.Game.Text.XivChatType.SystemMessage,
+				Message = SeString.CreateItemLink( (uint)itemId ),
+			} );
+		}
+		ImGui.SameLine();
+		ImGui.Text( $"{itemId}: {ItemUtils.GetUnformattedName( (uint)itemId )}" );
+	}
+
 	private void DrawGCItems()
 	{
-		foreach( var item in ItemCategorizer.DEBUG_GetGCItems() )
-		{
-			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
-		}
+		foreach( var item in ItemCategorizer.DEBUG_GetGCItems() ) DrawDebugItem( item );
 	}
 
 	private void DrawLeveItems()
 	{
-		foreach( var item in ItemCategorizer.DEBUG_GetLeveItems() )
-		{
-			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
-		}
+		foreach( var item in ItemCategorizer.DEBUG_GetLeveItems() ) DrawDebugItem( item );
 	}
 
 	private void DrawEhcatlItems()
 	{
-		foreach( var item in ItemCategorizer.DEBUG_GetEhcatlItems() )
-		{
-			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
-		}
+		foreach( var item in ItemCategorizer.DEBUG_GetEhcatlItems() ) DrawDebugItem( item );
 	}
 
 	private void DrawCraftingMaterials()
 	{
-		foreach( var item in ItemCategorizer.DEBUG_GetCraftingMaterials() )
-		{
-			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
-		}
+		foreach( var item in ItemCategorizer.DEBUG_GetCraftingMaterials() ) DrawDebugItem( item );
 	}
 
 	private void DrawAquariumFish()
 	{
-		foreach( var item in ItemCategorizer.DEBUG_GetAquariumFish() )
-		{
-			ImGui.Text( $"{item}: {ItemUtils.GetUnformattedName( (uint)item )}" );
-		}
+		foreach( var item in ItemCategorizer.DEBUG_GetAquariumFish() ) DrawDebugItem( item );
 	}
 
 	private void DrawCofferManifests()
 	{
 		foreach( var cofferManifest in CofferManifests.DEBUG_GetCofferManifests() )
 		{
+			if( ImGui.SmallButton( $"Link###ItemId_{cofferManifest.Key}" ) )
+			{
+				DalamudAPI.ChatGui.Print( new()
+				{
+					Type = Dalamud.Game.Text.XivChatType.SystemMessage,
+					Message = SeString.CreateItemLink( (uint)cofferManifest.Key ),
+				} );
+			}
+
 			string str = mResolveCofferManifestItemNames ? ItemUtils.GetUnformattedName( (uint)cofferManifest.Key ) : cofferManifest.Key.ToString();
 			str += ": ";
 
@@ -113,6 +122,7 @@ internal sealed class Window_Debug_LoadedItems : Window, IDisposable
 				str += ", ";
 			}
 
+			ImGui.SameLine();
 			ImGui.Text( str );
 		}
 	}
